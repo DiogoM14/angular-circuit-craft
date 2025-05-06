@@ -33,9 +33,9 @@
             ],
             "styles": [
               "src/styles.scss",
-              "node_modules/drawflow/dist/drawflow.min.css"
+              "node_modules/circuit-craft-core/dist/drawflow.min.css"
             ],
-            "scripts": ["node_modules/drawflow/dist/drawflow.min.js"]
+            "scripts": ["node_modules/circuit-craft-core/dist/drawflow.min.js"]
           },
           "configurations": {
             "production": {

@@ -1,33 +1,5 @@
-<header class="header">
-  <h3>Drawflow Example Angular</h3>
-  <!-- <button type="button" class="primary" (click)="export()">Exportar</button> -->
-</header>
-
 <div class="container">
-  <!-- <aside class="sidebar" (dragover)="allowDrop($event)" (drop)="drop($event)">
-    <ul>
-      <li *ngFor="let n of listNodes"
-          draggable="true"
-          [attr.data-node]="n.item"
-          (dragstart)="drag($event)">
-          {{ n| json}}
-        <div class="node" [style.background]="n.color">{{ n.name }}</div>
-      </li>
-    </ul>
-  </aside> -->
-
   <main class="workspace">
-    <div id="drawflow" #canvas></div>
+    <div id="drawflow" class="bg-base-300" #canvas></div>
   </main>
 </div>
-
-<!-- Modal extremamente simples -->
-<!-- <section class="modal" *ngIf="dialog">
-  <div class="modal-content">
-    <h4>Export</h4>
-    <pre><code>{{ dialogData | json }}</code></pre>
-    <footer>
-      <button (click)="dialog=false">Fechar</button>
-    </footer>
-  </div>
-</section> -->

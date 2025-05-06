@@ -18,6 +18,9 @@
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
     "@ng-draw-flow/core": "^0.8.0",
+    "@ng-icons/core": "^31.3.0",
+    "@ng-icons/heroicons": "^31.3.0",
+    "@ng-icons/material-icons": "^31.3.0",
     "@tailwindcss/postcss": "^4.1.4",
     "daisyui": "^5.0.27",
     "drawflow": "^0.0.60",
@@ -32,14 +35,19 @@
     "@angular-devkit/build-angular": "^19.2.8",
     "@angular/cli": "^19.2.8",
     "@angular/compiler-cli": "^19.2.0",
+    "@eslint/css": "^0.7.0",
+    "@eslint/js": "^9.26.0",
     "@types/drawflow": "^0.0.12",
     "@types/jasmine": "~5.1.0",
+    "eslint": "^9.26.0",
+    "globals": "^16.0.0",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.32.0"
   }
 }
