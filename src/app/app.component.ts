@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AppHeaderComponent } from './components/app-header/app-header.component';
+import { EditorComponent } from './components/editor/editor.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [AppHeaderComponent, EditorComponent],
+  standalone: true
 })
 export class AppComponent {
   title = 'angular-circuit-craft';
