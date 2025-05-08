@@ -1,5 +1,6 @@
-<div class="container">
-  <main class="workspace">
-    <div id="drawflow" class="bg-base-300" #canvas></div>
-  </main>
-</div>
+  <div class="container">
+    <main>
+      <div id="drawflow" class="bg-base-300" #canvas (drop)="handleDrop($event)" (dragover)="handleAllowDrop($event)"></div>
+    </main>
+    
+  </div>

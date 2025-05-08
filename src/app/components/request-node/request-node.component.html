@@ -1,6 +1,6 @@
-<div style="background-color: #1e1e1e; padding: 20px; border-radius: 10px; width: 400px;">
+<div style="background-color: #ffff; padding: 20px; border-radius: 10px; width: 400px;">
   <select [(ngModel)]="method" style="padding: 10px; font-size: 16px; width: 100%;">
-    @for (m of methods; track method) {
+    @for (m of methods; track m) {
       <option [value]="m">{{ m }}</option>
     }
   </select>
