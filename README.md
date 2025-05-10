@@ -121,7 +121,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-For questions or support, reach out to [DiogoM14](https://x.com/DiogoM14).
+For questions or support, reach out to [DiogoM14](mailto:diogomartins200214@gmail.com).
 
 ## 🙌 Acknowledgments
 
