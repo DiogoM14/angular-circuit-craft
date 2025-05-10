@@ -1,18 +1,17 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import Drawflow from 'drawflow';
-import {Subject} from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DrawflowService {
   private editor!: Drawflow;
-  private nodeDataChangedSubject = new Subject<{ id: string, data: any }>();
+  private nodeDataChangedSubject = new Subject<{ id: string; data: any }>();
 
   nodeDataChanged$ = this.nodeDataChangedSubject.asObservable();
 
   public initializeEditor(container: HTMLElement) {
-
     this.editor = new Drawflow(container);
     this.editor.start();
 
@@ -53,17 +52,7 @@ export class DrawflowService {
       ></node-content-element>
     `;
 
-    const nodeId = this.editor.addNode(
-      name,
-      inputs,
-      outputs,
-      posX,
-      posY,
-      name,
-      data,
-      htmlContent,
-      false
-    );
+    const nodeId = this.editor.addNode(name, inputs, outputs, posX, posY, name, data, htmlContent, false);
 
     this.setupWebComponentEventListeners(nodeId.toString());
     return nodeId;

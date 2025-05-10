@@ -1,7 +1,7 @@
-import {Component, inject} from '@angular/core';
-import {SideNavItem} from './types/side-nav-items.type';
-import {SideNavItemsConfig} from './config/side-nav-items.config';
-import {NgIcon, provideIcons} from '@ng-icons/core';
+import { Component, inject } from '@angular/core';
+import { SideNavItem } from './types/side-nav-items.type';
+import { SideNavItemsConfig } from './config/side-nav-items.config';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   heroClipboardDocumentCheck,
   heroClock,
@@ -10,25 +10,27 @@ import {
   heroMoon,
   heroRectangleGroup,
   heroSun,
-  heroUserGroup
+  heroUserGroup,
 } from '@ng-icons/heroicons/outline';
-import {allThemes, ThemeService} from '../../services/state/theme.state';
+import { allThemes, ThemeService } from '../../services/state/theme.state';
 
 @Component({
   selector: 'app-side-nav',
   templateUrl: './app-side-nav.component.html',
   standalone: true,
   imports: [NgIcon],
-  viewProviders: [provideIcons({
-    heroMagnifyingGlass,
-    heroUserGroup,
-    heroClipboardDocumentCheck,
-    heroRectangleGroup,
-    heroGlobeAlt,
-    heroClock,
-    heroSun,
-    heroMoon
-  })]
+  viewProviders: [
+    provideIcons({
+      heroMagnifyingGlass,
+      heroUserGroup,
+      heroClipboardDocumentCheck,
+      heroRectangleGroup,
+      heroGlobeAlt,
+      heroClock,
+      heroSun,
+      heroMoon,
+    }),
+  ],
 })
 export class AppSideNavComponent {
   public sideNavItems: SideNavItem[] = SideNavItemsConfig;

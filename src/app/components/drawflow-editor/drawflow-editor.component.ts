@@ -27,14 +27,7 @@ export class DrawflowEditorComponent implements OnInit {
       value: `Value ${this.nodeCount}`,
     };
 
-    this.drawflowService.addWebComponentNode(
-      'web-component-node',
-      1,
-      1,
-      100,
-      100 + (this.nodeCount * 50),
-      data,
-    );
+    this.drawflowService.addWebComponentNode('web-component-node', 1, 1, 100, 100 + this.nodeCount * 50, data);
   }
 
   public exportFlow() {

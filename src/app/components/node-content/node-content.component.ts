@@ -6,20 +6,17 @@ import { HttpClient } from '@angular/common/http';
   standalone: true,
   templateUrl: './node-content.component.html',
   styleUrl: './node-content.component.scss',
-  encapsulation: ViewEncapsulation.ShadowDom
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class NodeContentComponent {
   private http = inject(HttpClient);
 
-  public title = input('Node') ;
+  public title = input('Node');
   public valueChange = output<string>();
 
   protected handleRequest() {
-    this.http.get("https://pokeapi.co/api/v2/pokemon").subscribe(res => {
+    this.http.get('https://pokeapi.co/api/v2/pokemon').subscribe(res => {
       this.valueChange.emit(JSON.stringify(res));
-    })
+    });
   }
 }
-
-
-
