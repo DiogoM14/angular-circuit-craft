@@ -33,9 +33,11 @@
             ],
             "styles": [
               "src/styles.scss",
-              "node_modules/circuit-craft-core/dist/drawflow.min.css"
+              "node_modules/drawflow/dist/drawflow.min.css"
             ],
-            "scripts": ["node_modules/circuit-craft-core/dist/drawflow.min.js"]
+            "scripts": [
+              "node_modules/drawflow/dist/drawflow.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -96,8 +98,22 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }

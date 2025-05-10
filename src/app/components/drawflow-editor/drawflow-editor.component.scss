@@ -1,0 +1,17 @@
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  padding: 10px;
+  background-color: #8a8a8a;
+}
+
+.drawflow-container {
+  height: 100vh;
+  border: 1px solid #ccc;
+}
