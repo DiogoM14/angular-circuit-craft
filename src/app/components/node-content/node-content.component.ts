@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, input, inject, output } from '@angular/co
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-node-content',
+  selector: 'cc-node-content',
   standalone: true,
   templateUrl: './node-content.component.html',
   styleUrl: './node-content.component.scss',

@@ -1,12 +1,10 @@
 import { Component, Inject, Optional } from '@angular/core';
-import { AppHeaderComponent } from './components/app-header/app-header.component';
-import { AppSideNavComponent } from './components/app-side-nav/app-side-nav.component';
-import { DrawflowEditorComponent } from './components/drawflow-editor/drawflow-editor.component';
+import { WorkflowComponent } from './pages/workflow/workflow.component';
 
 @Component({
-  selector: 'app-root',
+  selector: 'cc-root',
   templateUrl: './app.component.html',
-  imports: [AppHeaderComponent, AppSideNavComponent, DrawflowEditorComponent],
+  imports: [WorkflowComponent],
   standalone: true,
 })
 export class AppComponent {

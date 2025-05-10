@@ -1,0 +1,16 @@
+<header class="navbar px-7 bg-base-100 shadow-sm">
+  <div class="flex flex-row flex-1 items-center">
+    <a class="font-bold text-xl cursor-pointer">Angular Circuit Craft</a>
+  </div>
+
+  <div class="flex gap-4">
+    <button class="btn btn-active btn-secondary" (click)="handleImportFlow()">
+      Import
+      <ng-icon name="heroArrowDownTray" />
+    </button>
+    <button class="btn btn-active btn-secondary" (click)="handleExportFlow()">
+      Export
+      <ng-icon name="heroArrowUpTray" />
+    </button>
+  </div>
+</header>
