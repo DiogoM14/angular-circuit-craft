@@ -1,59 +1,141 @@
-# AngularCircuitCraft
+# Angular Circuit Craft
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.8.
+Angular Circuit Craft is a powerful visual workflow editor built with Angular 19. It allows users to create, manipulate, and visualize node-based workflow diagrams using a drag-and-drop interface.
 
-## Development server
 
-To start a local development server, run:
+## ✨ Features
+
+- **Visual Workflow Editor**: Intuitive node-based workflow editor using Drawflow.
+- **Custom Node Components**: Create and use custom web components as nodes.
+- **Import/Export Functionality**: Save and load your workflow designs.
+- **Modern UI**: Built with Tailwind CSS and DaisyUI for a clean, responsive interface.
+
+## 🚀 Technologies Used
+
+- Angular 19
+- Drawflow
+- Tailwind CSS
+- DaisyUI
+- Material Icons
+
+## 📋 Prerequisites
+
+- Node.js (v18 or higher)
+- npm or pnpm
+
+## 🔧 Installation
+
+Clone the repository:
 
 ```bash
-ng serve
+git clone https://github.com/DiogoM14/angular-circuit-craft.git
+cd angular-circuit-craft
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Install dependencies:
 
-## Code scaffolding
+```bash
+npm install
+# or
+pnpm install
+```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Start the development server:
+
+```bash
+npm start
+# or
+pnpm start
+```
+
+Open your browser and navigate to `http://localhost:4200/`.
+
+## 💻 Usage
+
+Angular Circuit Craft provides a visual canvas where you can:
+
+- Drag components from the sidebar onto the canvas.
+- Connect nodes to create workflows.
+- Configure node properties.
+- Export your workflow designs for later use.
+- Import existing workflows.
+
+## 🏗️ Project Structure
+
+```
+angular-circuit-craft/
+├── src/
+│   ├── app/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/             # Application pages
+│   │   ├── services/          # Services including DrawflowService
+│   │   └── app.component.*    # Root component
+│   ├── index.html             # Main HTML entry
+│   ├── main.ts                # Angular bootstrap
+│   └── styles.scss            # Global styles
+├── package.json               # Project dependencies
+└── README.md                  # Project documentation
+```
+
+## 🛠️ Development
+
+### Code Scaffolding
+
+To generate a new component:
 
 ```bash
 ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Building for Production
 
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
-
-To build the project run:
+### Linting
 
 ```bash
-ng build
+npm run lint
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Formatting
 
 ```bash
-ng test
+npm run format
 ```
 
-## Running end-to-end tests
+## 🤝 Contributing
 
-For end-to-end (e2e) testing, run:
+Contributions are welcome! Please follow these steps:
 
-```bash
-ng e2e
-```
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m 'Add some amazing feature'`).
+4. Push to the branch (`git push origin feature/amazing-feature`).
+5. Open a Pull Request.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📄 License
 
-## Additional Resources
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 📞 Contact
+
+For questions or support, reach out to [DiogoM14](https://x.com/DiogoM14).
+
+## 🙌 Acknowledgments
+
+- Uses [Angular](https://angular.io), [Drawflow](https://github.com/jerosoler/Drawflow), [Tailwind CSS](https://tailwindcss.com), [DaisyUI](https://daisyui.com), and [Material Icons](https://material.io/resources/icons).
+- Thanks to the open-source community.
+
+## 📝 Notes
+
+This README was created based on the project's code structure and dependencies. The Angular Circuit Craft application is built around a visual workflow editor using the Drawflow library, with a modern UI implemented using Angular, Tailwind CSS, and DaisyUI.
+
+To customize this README further, consider adding:
+
+- Screenshots of the application.
+- More detailed usage examples.
+- API documentation.
+- Deployment instructions.
+- Troubleshooting section.
