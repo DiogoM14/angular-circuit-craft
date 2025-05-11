@@ -11,12 +11,10 @@ import {
   heroUserGroup,
 } from '@ng-icons/heroicons/outline';
 import { ThemeService } from '../../services/theme.service';
-import { DrawflowService } from '../../services/drawflow.service';
 
 @Component({
   selector: 'cc-side-nav',
   templateUrl: './side-nav.component.html',
-  standalone: true,
   imports: [NgIcon],
   viewProviders: [
     provideIcons({
@@ -33,19 +31,13 @@ import { DrawflowService } from '../../services/drawflow.service';
 })
 export class SideNavComponent {
   public themService = inject(ThemeService);
-  private drawflowService = inject(DrawflowService);
 
   //public sideNavItems: SideNavItem[] = SideNavItemsConfig;
-  private nodeCount = 0;
 
-  public addNode() {
-    this.nodeCount++;
-    const data = {
-      title: `Node ${this.nodeCount}`,
-      value: `Value ${this.nodeCount}`,
-    };
-
-    this.drawflowService.addWebComponentNode('web-component-node', 1, 1, 100, 100 + this.nodeCount * 50, data);
+  public handleDrag(event: DragEvent | null) {
+    if (!event?.dataTransfer || !event.target) return;
+    const target = event.target as HTMLElement;
+    event.dataTransfer.setData('node', target.getAttribute('data-node') || '');
   }
 
   public toggleTheme(target: EventTarget | null) {

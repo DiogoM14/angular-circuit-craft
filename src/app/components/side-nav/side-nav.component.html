@@ -30,7 +30,7 @@
           Core
         </summary>
         <ul>
-          <li (click)="addNode()">
+          <li draggable="true" (dragstart)="handleDrag($event)" tabindex="0">
             <a>
               <ng-icon name="heroGlobeAlt" />
               HTTP Request

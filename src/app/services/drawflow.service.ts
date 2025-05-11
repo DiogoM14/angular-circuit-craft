@@ -42,7 +42,7 @@ export class DrawflowService {
         }) as EventListener);*/
   }
 
-  addWebComponentNode(name: string, inputs: number, outputs: number, posX: number, posY: number, data: any) {
+  public addWebComponentNode(name: string, inputs: number, outputs: number, posX: number, posY: number, data: any) {
     const htmlContent = `
       <node-content-element
         title="${data.title || 'Node'}"
@@ -67,9 +67,11 @@ export class DrawflowService {
 
     webComponent.setAttribute('data-node-id', nodeId);
 
-    webComponent.addEventListener('valueChange', (event: any) => {
-      const value = event.detail;
+    webComponent.addEventListener('valueChange', (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const value = customEvent.detail;
       const nodeData = this.editor.getNodeFromId(nodeId);
+
       if (nodeData) {
         nodeData.data.value = value;
         this.editor.updateNodeDataFromId(nodeId, nodeData.data);
@@ -77,11 +79,11 @@ export class DrawflowService {
     });
   }
 
-  exportFlow() {
+  public exportFlow() {
     return this.editor.export();
   }
 
-  importFlow(data: any) {
+  public importFlow(data: string) {
     this.editor.import(data);
     this.setupAllWebComponentEventListeners();
   }
