@@ -32,8 +32,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/drawflow/dist/drawflow.min.css"
+              "src/styles.scss"
             ],
             "scripts": [
               "node_modules/drawflow/dist/drawflow.min.js"
