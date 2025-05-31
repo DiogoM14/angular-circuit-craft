@@ -1,1 +1,195 @@
-<cc-workflow />
+<div class="circuit-craft-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <h1 class="logo">
+            <span class="logo-icon">⚡</span>
+            Circuit Craft
+          </h1>
+          <div class="header-actions">
+            <button class="btn btn-secondary" (click)="clearWorkflow()">
+              <span class="icon">🗑️</span>
+              Limpar
+            </button>
+            <button class="btn btn-primary" (click)="saveWorkflow()">
+              <span class="icon">💾</span>
+              Salvar
+            </button>
+            <button class="btn btn-success" (click)="executeWorkflow()">
+              <span class="icon">▶️</span>
+              Executar
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <!-- Sidebar com Conectores -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <h3>Conectores</h3>
+            <input
+              type="text"
+              placeholder="Buscar conectores..."
+              class="search-input"
+              [(ngModel)]="searchTerm"
+              (input)="filterConnectors()"
+            >
+          </div>
+
+          <div class="connector-categories">
+            <div *ngFor="let category of categories" class="category">
+              <h4 class="category-title" (click)="toggleCategory(category.name)">
+                <span class="category-icon">{{ category.expanded ? '▼' : '▶' }}</span>
+                {{ category.name }}
+              </h4>
+
+              <div *ngIf="category.expanded" class="category-items">
+                <div
+                  *ngFor="let connector of getFilteredConnectors(category.name)"
+                  class="connector-item"
+                  draggable="true"
+                  (dragstart)="onDragStart($event, connector)"
+                >
+                  <span class="connector-icon">{{ connector.icon }}</span>
+                  <div class="connector-info">
+                    <div class="connector-name">{{ connector.name }}</div>
+                    <div class="connector-description">{{ connector.description }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Playground Principal -->
+        <main class="playground">
+          <div class="playground-header">
+            <div class="workflow-title">
+              <input
+                type="text"
+                [(ngModel)]="workflowName"
+                placeholder="Nome do Workflow"
+                class="workflow-name-input"
+              >
+            </div>
+            <div class="playground-controls">
+              <button class="btn btn-outline" (click)="zoomIn()">🔍+</button>
+              <button class="btn btn-outline" (click)="zoomOut()">🔍-</button>
+              <button class="btn btn-outline" (click)="resetZoom()">⚡</button>
+            </div>
+          </div>
+
+          <div class="drawflow-container">
+            <div
+              #drawflowContainer
+              id="drawflow"
+              class="drawflow-canvas"
+              (drop)="onDrop($event)"
+              (dragover)="onDragOver($event)"
+            ></div>
+          </div>
+        </main>
+
+        <!-- Panel de Propriedades -->
+        <aside class="properties-panel" [class.expanded]="selectedNode">
+          <div class="properties-header">
+            <h3>Propriedades</h3>
+            <button *ngIf="selectedNode" class="btn btn-small btn-danger" (click)="deleteSelectedNode()">
+              🗑️ Excluir
+            </button>
+          </div>
+
+          <div *ngIf="selectedNode" class="properties-content">
+            <div class="property-group">
+              <label>Nome do Node</label>
+              <input
+                type="text"
+                [(ngModel)]="selectedNode.name"
+                (change)="updateNodeProperties()"
+                class="property-input"
+              >
+            </div>
+
+            <div class="property-group">
+              <label>Tipo</label>
+              <input
+                type="text"
+                [value]="selectedNode.type"
+                readonly
+                class="property-input readonly"
+              >
+            </div>
+
+            <!-- Configurações específicas do connector -->
+            <div *ngIf="selectedNode.type === 'http-request'" class="property-group">
+              <label>URL</label>
+              <input
+                type="text"
+                [(ngModel)]="selectedNode.config.url"
+                placeholder="https://api.exemplo.com/data"
+                class="property-input"
+              >
+
+              <label>Método</label>
+              <select
+                [(ngModel)]="selectedNode.config.method"
+                class="property-select"
+              >
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+              </select>
+
+              <label>Headers (JSON)</label>
+              <textarea
+                [(ngModel)]="selectedNode.config.headers"
+                placeholder='{"Content-Type": "application/json"}'
+                class="property-textarea"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div *ngIf="selectedNode.type === 'display-data'" class="property-group">
+              <label>Formato de Exibição</label>
+              <select
+                [(ngModel)]="selectedNode.config.format"
+                class="property-select"
+              >
+                <option value="table">Tabela</option>
+                <option value="json">JSON</option>
+                <option value="chart">Gráfico</option>
+              </select>
+            </div>
+
+            <div *ngIf="selectedNode.type === 'filter'" class="property-group">
+              <label>Condição de Filtro</label>
+              <input
+                type="text"
+                [(ngModel)]="selectedNode.config.condition"
+                placeholder="item.status === 'active'"
+                class="property-input"
+              >
+            </div>
+          </div>
+
+          <div *ngIf="!selectedNode" class="no-selection">
+            <div class="no-selection-icon">🎯</div>
+            <p>Selecione um node para ver suas propriedades</p>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Status Bar -->
+      <footer class="status-bar">
+        <div class="status-info">
+          <span>Nodes: {{ nodeCount }}</span>
+          <span>Conexões: {{ connectionCount }}</span>
+          <span>Status: {{ workflowStatus }}</span>
+        </div>
+        <div class="zoom-info">
+          Zoom: {{ currentZoom }}%
+        </div>
+      </footer>
+    </div>
