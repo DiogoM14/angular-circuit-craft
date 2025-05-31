@@ -69,7 +69,7 @@ export class WorkflowService {
   async executeWorkflow(workflowId: string): Promise<ExecutionResult> {
     const workflow = this.workflows.value.find(w => w.id === workflowId);
     if (!workflow) {
-      throw new Error('Workflow não encontrado');
+      throw new Error('Workflow not found');
     }
 
     const executionResult: ExecutionResult = {
@@ -82,7 +82,6 @@ export class WorkflowService {
     };
 
     try {
-      // Simula execução dos nodes em ordem topológica
       const sortedNodes = this.topologicalSort(workflow.nodes, workflow.connections);
 
       for (const node of sortedNodes) {
@@ -90,7 +89,7 @@ export class WorkflowService {
           const result = await this.executeNode(node, executionResult.results);
           executionResult.results[node.id] = result;
         } catch (error) {
-          executionResult.errors[node.id] = error instanceof Error ? error.message : 'Erro desconhecido';
+          executionResult.errors[node.id] = error instanceof Error ? error.message : 'Unknown error';
           executionResult.status = 'failed';
           break;
         }
@@ -102,7 +101,7 @@ export class WorkflowService {
 
     } catch (error) {
       executionResult.status = 'failed';
-      executionResult.errors['workflow'] = error instanceof Error ? error.message : 'Erro na execução do workflow';
+      executionResult.errors['workflow'] = error instanceof Error ? error.message : 'Workflow execution error';
     }
 
     executionResult.endTime = new Date();
@@ -110,7 +109,6 @@ export class WorkflowService {
   }
 
   private async executeNode(node: WorkflowNode, previousResults: { [nodeId: string]: any }): Promise<any> {
-    // Simula execução baseada no tipo do node
     switch (node.type) {
       case 'http-request':
         return await this.executeHttpRequest(node.data);
@@ -128,17 +126,16 @@ export class WorkflowService {
         return this.executeDisplay(displayInput, node.data.format);
 
       default:
-        return { message: `Node tipo ${node.type} executado`, data: node.data };
+        return { message: `Node type ${node.type} executed`, data: node.data };
     }
   }
 
   private async executeHttpRequest(config: any): Promise<any> {
-    // Simula requisição HTTP
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           status: 200,
-          data: { message: 'Dados da API', timestamp: new Date().toISOString() },
+          data: { message: 'API data', timestamp: new Date().toISOString() },
           headers: { 'content-type': 'application/json' }
         });
       }, 1000);
@@ -149,23 +146,20 @@ export class WorkflowService {
     if (!Array.isArray(data)) return [];
 
     try {
-      // Avaliação segura da condição (em produção, use uma biblioteca segura)
       return data.filter((item) => {
-        // Implementar avaliação segura da condição aqui
-        return true; // Placeholder
+        return true;
       });
     } catch (error) {
-      throw new Error(`Erro no filtro: ${error}`);
+      throw new Error(`Filter error: ${error}`);
     }
   }
 
   private executeTransform(data: any, mapping: string): any {
     try {
       const mappingObj = JSON.parse(mapping);
-      // Implementar transformação baseada no mapping
       return { ...data, transformed: true, mapping: mappingObj };
     } catch (error) {
-      throw new Error(`Erro na transformação: ${error}`);
+      throw new Error(`Transform error: ${error}`);
     }
   }
 
@@ -178,7 +172,6 @@ export class WorkflowService {
   }
 
   private getInputData(node: WorkflowNode, previousResults: { [nodeId: string]: any }): any {
-    // Obtém dados dos nodes conectados às entradas
     const inputData: any[] = [];
 
     node.inputs.forEach(input => {
@@ -191,7 +184,6 @@ export class WorkflowService {
   }
 
   private topologicalSort(nodes: WorkflowNode[], connections: NodeConnection[]): WorkflowNode[] {
-    // Implementa ordenação topológica para executar nodes na ordem correta
     const visited = new Set<string>();
     const result: WorkflowNode[] = [];
 
@@ -200,7 +192,6 @@ export class WorkflowService {
 
       visited.add(nodeId);
 
-      // Visita dependências primeiro
       connections
         .filter(conn => conn.targetNode === nodeId)
         .forEach(conn => visit(conn.sourceNode));
@@ -228,7 +219,7 @@ export class WorkflowService {
         this.workflows.next(workflows);
       }
     } catch (error) {
-      console.error('Erro ao carregar workflows:', error);
+      console.error('Error loading workflows:', error);
     }
   }
 
@@ -237,7 +228,7 @@ export class WorkflowService {
       const workflows = this.workflows.value;
       localStorage.setItem('circuit_craft_workflows', JSON.stringify(workflows));
     } catch (error) {
-      console.error('Erro ao salvar workflows:', error);
+      console.error('Error saving workflows:', error);
     }
   }
 }

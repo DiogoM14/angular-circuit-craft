@@ -1,12 +1,10 @@
 <div class="circuit-craft-app">
-      <!-- Modern Header with Glassmorphism -->
       <header class="app-header">
         <div class="header-left">
           <div class="logo-section">
             <div class="logo-icon">⚡</div>
             <div class="logo-text">
               <h1>Circuit Craft</h1>
-              <span class="tagline">Visual Automation Builder</span>
             </div>
           </div>
           
@@ -17,10 +15,6 @@
               placeholder="Untitled Workflow"
               class="workflow-title-input"
             >
-            <div class="workflow-meta">
-              <span class="node-count">{{ nodeCount }} nodes</span>
-              <span class="connection-count">{{ connectionCount }} connections</span>
-            </div>
           </div>
         </div>
 
@@ -28,19 +22,19 @@
           <div class="execution-controls">
             <button class="btn btn-execute" (click)="executeWorkflow()">
               <span>▶️</span>
-              Executar
+              Run
             </button>
             <button class="btn btn-secondary" (click)="clearWorkflow()">
               <span>🗑️</span>
-              Limpar
+              Clear
             </button>
             <button class="btn btn-outline" (click)="saveWorkflow()">
               <span>💾</span>
-              Salvar
+              Save
             </button>
             <button class="btn btn-outline" (click)="openLoadDialog()">
               <span>📂</span>
-              Carregar
+              Load
             </button>
           </div>
         </div>
@@ -66,9 +60,7 @@
         </div>
       </header>
 
-      <!-- Main Workspace -->
       <div class="app-workspace">
-        <!-- Enhanced Sidebar -->
         <aside class="sidebar" [class.collapsed]="false">
           <div class="sidebar-header">
             <h3>Components</h3>
@@ -114,9 +106,7 @@
           </div>
         </aside>
 
-        <!-- Enhanced Canvas -->
         <main class="canvas-container">
-          <!-- Canvas Toolbar -->
           <div class="canvas-toolbar">
             <div class="toolbar-left">
               <div class="node-selection-info" *ngIf="selectedNode">
@@ -137,7 +127,6 @@
             </div>
           </div>
 
-          <!-- Main Canvas -->
           <div class="canvas-wrapper">
             <div
               #drawflowContainer
@@ -147,7 +136,6 @@
               (dragover)="onDragOver($event)"
             ></div>
             
-            <!-- Canvas Overlay for Empty State -->
             <div class="canvas-empty-state" *ngIf="nodeCount === 0">
               <div class="empty-state-content">
                 <div class="empty-state-icon">🚀</div>
@@ -169,10 +157,8 @@
         </main>
       </div>
 
-      <!-- Modern Modal Dialog -->
       <div class="dialog-overlay" *ngIf="showConfigDialog" (click)="closeConfigDialog()">
         <div class="dialog-container" (click)="$event.stopPropagation()">
-          <!-- Dialog Header -->
           <div class="dialog-header">
             <div class="dialog-header-content">
               <div class="node-type-indicator" [attr.data-type]="selectedNode?.type">
@@ -188,9 +174,7 @@
             </button>
           </div>
 
-          <!-- Dialog Content -->
           <div class="dialog-body" *ngIf="selectedNode">
-            <!-- Node Basic Info -->
             <div class="config-section">
               <div class="section-header">
                 <h3>Basic Information</h3>
@@ -207,33 +191,31 @@
               </div>
             </div>
 
-            <!-- Display Data Section -->
             <div class="config-section" *ngIf="selectedNode?.type === 'display-data'">
               <div class="section-header">
-                <h3>📊 Visualização de Dados</h3>
+                <h3>📊 Data Visualization</h3>
                 <span class="section-badge">Output</span>
               </div>
 
               <div class="form-group">
-                <label for="format">Formato de Exibição</label>
+                <label for="format">Display Format</label>
                 <select 
                   id="format" 
                   class="form-select" 
                   [(ngModel)]="selectedNode.config.format"
                   (change)="onConfigChange()">
-                  <option value="table">Tabela</option>
+                  <option value="table">Table</option>
                   <option value="json">JSON</option>
                   <option value="raw">Raw</option>
                 </select>
               </div>
 
-              <!-- Data Preview -->
               <div class="transform-panel">
                 <div class="panel-header">
-                  <h4>💾 Dados de Entrada</h4>
+                  <h4>💾 Input Data</h4>
                   <button class="btn btn-xs btn-ghost" 
                           (click)="executeWorkflow()"
-                          title="Atualizar dados">
+                          title="Refresh data">
                     🔄
                   </button>
                 </div>
@@ -244,21 +226,19 @@
                   <ng-template #noInputData>
                     <div class="no-data-message">
                       <div class="icon">📭</div>
-                      <p>Nenhum dado disponível</p>
-                      <small>Execute o workflow para ver os dados</small>
+                      <p>No data available</p>
+                      <small>Run the workflow to see data</small>
                     </div>
                   </ng-template>
                 </div>
               </div>
 
-              <!-- Results Display -->
               <div class="transform-panel" *ngIf="displayDataResults[selectedNode.id]">
                 <div class="panel-header">
-                  <h4>📊 Dados Visualizados</h4>
-                  <span class="section-badge success">Executado</span>
+                  <h4>📊 Visualized Data</h4>
+                  <span class="section-badge success">Executed</span>
                 </div>
                 <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format === 'table'">
-                  <!-- Table View -->
                   <div class="table-container" *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length > 0">
                     <table class="data-table">
                       <thead>
@@ -279,7 +259,7 @@
                   </div>
                   <div *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length === 0" class="no-data-message">
                     <div class="icon">📊</div>
-                    <p>Nenhum dado para exibir em tabela</p>
+                    <p>No data to display in table</p>
                   </div>
                 </div>
                 <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format !== 'table'">
@@ -288,7 +268,6 @@
               </div>
             </div>
 
-            <!-- Node-specific Configuration -->
             <div class="config-section" *ngIf="selectedNode.type === 'http-request'">
               <div class="section-header">
                 <h3>HTTP Request Configuration</h3>
@@ -344,14 +323,12 @@
               </div>
             </div>
 
-            <!-- Transform Configuration (Enhanced) -->
             <div class="config-section" *ngIf="selectedNode.type === 'transform'">
               <div class="section-header">
                 <h3>Data Transformation</h3>
                 <span class="section-badge advanced">Advanced</span>
               </div>
 
-              <!-- Input Preview -->
               <div class="transform-panel">
                 <div class="panel-header">
                   <h4>📥 Input Data</h4>
@@ -370,7 +347,6 @@
                 </div>
               </div>
 
-              <!-- Field Mappings -->
               <div class="transform-panel">
                 <div class="panel-header">
                   <h4>🔧 Field Mappings</h4>
@@ -443,7 +419,6 @@
                 </div>
               </div>
 
-              <!-- Output Preview -->
               <div class="transform-panel">
                 <div class="panel-header">
                   <h4>📤 Output Preview</h4>
@@ -460,12 +435,16 @@
               </div>
             </div>
 
-            <!-- Filter Section -->
             <div class="config-section" *ngIf="selectedNode?.type === 'filter'">
-              <!-- ... existing code ... -->
+              <div class="section-header">
+                <h3>Data Filter</h3>
+                <span class="section-badge">Filter</span>
+              </div>
+              
+              
+              
             </div>
 
-            <!-- Execution Results -->
             <div class="config-section" *ngIf="executionResults[selectedNode.id]">
               <div class="section-header">
                 <h3>Execution Results</h3>
@@ -477,7 +456,6 @@
             </div>
           </div>
 
-          <!-- Dialog Footer -->
           <div class="dialog-footer">
             <div class="footer-left">
               <button class="btn btn-danger" (click)="deleteSelectedNode()">
@@ -494,7 +472,6 @@
       </div>
     </div>
 
-    <!-- Load Workflow Dialog -->
     <div class="dialog-overlay" *ngIf="showLoadDialog" (click)="closeLoadDialog()">
       <div class="dialog-container" style="max-width: 600px" (click)="$event.stopPropagation()">
         <div class="dialog-header">
@@ -503,8 +480,8 @@
               <span class="node-icon">📂</span>
             </div>
             <div class="dialog-title-section">
-              <h2>Carregar Workflow</h2>
-              <p>Selecione um workflow salvo para carregar</p>
+              <h2>Load Workflow</h2>
+              <p>Select a saved workflow to load</p>
             </div>
           </div>
           <button class="dialog-close-btn" (click)="closeLoadDialog()">
@@ -515,8 +492,8 @@
         <div class="dialog-body">
           <div *ngIf="savedWorkflows.length === 0" class="no-data-message">
             <div class="icon">📭</div>
-            <h3>Nenhum workflow salvo</h3>
-            <p>Crie e salve um workflow primeiro para poder carregá-lo aqui.</p>
+            <h3>No saved workflows</h3>
+            <p>Create and save a workflow first to load it here.</p>
           </div>
 
           <div *ngIf="savedWorkflows.length > 0" class="workflows-list">
@@ -525,11 +502,11 @@
                  (click)="loadWorkflow(workflow)">
               <div class="workflow-info">
                 <div class="workflow-header">
-                  <h3>{{ workflow.name || 'Workflow sem nome' }}</h3>
+                  <h3>{{ workflow.name || 'Unnamed Workflow' }}</h3>
                   <div class="workflow-actions">
                     <button class="btn btn-xs btn-danger" 
                             (click)="$event.stopPropagation(); deleteWorkflow(workflow.id)"
-                            title="Deletar workflow">
+                            title="Delete workflow">
                       🗑️
                     </button>
                   </div>
@@ -552,11 +529,11 @@
 
         <div class="dialog-footer">
           <div class="footer-left">
-            <span class="status-text">{{ savedWorkflows.length }} workflow(s) disponível(is)</span>
+            <span class="status-text">{{ savedWorkflows.length }} workflow(s) available</span>
           </div>
           <div class="footer-right">
             <button class="btn btn-outline" (click)="closeLoadDialog()">
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>

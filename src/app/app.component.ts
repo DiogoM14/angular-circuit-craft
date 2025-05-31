@@ -1,9 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { WorkflowService } from './services/workflow.service';
-import { ConnectorService } from './services/connectors.service';
-import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms'; 
 import { ExecutionResult } from './types';
 
 declare var Drawflow: any;
@@ -22,7 +19,7 @@ interface SimpleConnectorTemplate {
   name: string;
   category: string;
   icon: string;
-  description: string;
+  description: string;  
   inputs: number;
   outputs: number;
   configSchema: any;
@@ -40,11 +37,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private editor: any;
   searchTerm = '';
-  workflowName = 'Novo Workflow';
+  workflowName = 'New Workflow';
   selectedNode: NodeData | null = null;
   nodeCount = 0;
   connectionCount = 0;
-  workflowStatus = 'Pronto';
+  workflowStatus = 'Ready';
   currentZoom = 100;
   executionResults: { [nodeId: string]: any } = {};
   previewData: { [nodeId: string]: any } = {};
@@ -57,10 +54,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   categories = [
     { name: 'HTTP & APIs', expanded: true },
-    { name: 'Dados & Transformação', expanded: true },
-    { name: 'Lógica & Controle', expanded: false },
-    { name: 'Notificações', expanded: false },
-    { name: 'Armazenamento', expanded: false }
+    { name: 'Data & Transformation', expanded: true },
+    { name: 'Logic & Control', expanded: false },
+    { name: 'Notifications', expanded: false },
+    { name: 'Storage', expanded: false }
   ];
 
   connectorTemplates: SimpleConnectorTemplate[] = [
@@ -69,47 +66,27 @@ export class AppComponent implements OnInit, AfterViewInit {
       name: 'HTTP Request',
       category: 'HTTP & APIs',
       icon: '🌐',
-      description: 'Faz requisições HTTP para APIs externas',
+      description: 'Makes HTTP requests to external APIs',
       inputs: 1,
       outputs: 1,
       configSchema: { url: '', method: 'GET', headers: '{}', body: '' }
     },
     {
-      id: 'webhook',
-      name: 'Webhook',
-      category: 'HTTP & APIs',
-      icon: '🔗',
-      description: 'Recebe dados via webhook',
-      inputs: 0,
-      outputs: 1,
-      configSchema: { path: '/webhook', method: 'POST' }
-    },
-    {
       id: 'display-data',
       name: 'Display Data',
-      category: 'Dados & Transformação',
+      category: 'Data & Transformation',
       icon: '📊',
-      description: 'Exibe dados em diferentes formatos',
+      description: 'Displays data in different formats',
       inputs: 1,
       outputs: 0,
       configSchema: { format: 'table' }
     },
     {
-      id: 'filter',
-      name: 'Filter',
-      category: 'Dados & Transformação',
-      icon: '🔍',
-      description: 'Filtra dados baseado em condições',
-      inputs: 1,
-      outputs: 1,
-      configSchema: { condition: '' }
-    },
-    {
       id: 'transform',
       name: 'Transform',
-      category: 'Dados & Transformação',
+      category: 'Data & Transformation',
       icon: '🔄',
-      description: 'Transforma estrutura dos dados',
+      description: 'Transforms data structure',
       inputs: 1,
       outputs: 1,
       configSchema: { mapping: '{}' }
@@ -117,9 +94,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     {
       id: 'if-condition',
       name: 'If Condition',
-      category: 'Lógica & Controle',
+      category: 'Logic & Control',
       icon: '🔀',
-      description: 'Condição if/else para controle de fluxo',
+      description: 'If/else condition for flow control',
       inputs: 1,
       outputs: 2,
       configSchema: { condition: '' }
@@ -127,9 +104,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     {
       id: 'delay',
       name: 'Delay',
-      category: 'Lógica & Controle',
+      category: 'Logic & Control',
       icon: '⏱️',
-      description: 'Adiciona delay na execução',
+      description: 'Adds delay to execution',
       inputs: 1,
       outputs: 1,
       configSchema: { delay: 1000 }
@@ -137,55 +114,29 @@ export class AppComponent implements OnInit, AfterViewInit {
     {
       id: 'email',
       name: 'Send Email',
-      category: 'Notificações',
+      category: 'Notifications',
       icon: '📧',
-      description: 'Envia emails via SMTP',
+      description: 'Sends emails via SMTP',
       inputs: 1,
       outputs: 1,
       configSchema: { to: '', subject: '', body: '' }
     },
     {
-      id: 'slack',
-      name: 'Slack',
-      category: 'Notificações',
-      icon: '💬',
-      description: 'Envia mensagens para o Slack',
-      inputs: 1,
-      outputs: 1,
-      configSchema: { channel: '', message: '' }
-    },
-    {
       id: 'database',
       name: 'Database',
-      category: 'Armazenamento',
+      category: 'Storage',
       icon: '🗄️',
-      description: 'Conecta com bancos de dados',
+      description: 'Connects to databases',
       inputs: 1,
       outputs: 1,
       configSchema: { query: '', connection: '' }
-    },
-    {
-      id: 'file-storage',
-      name: 'File Storage',
-      category: 'Armazenamento',
-      icon: '📁',
-      description: 'Upload/download de arquivos',
-      inputs: 1,
-      outputs: 1,
-      configSchema: { action: 'read', path: '' }
     }
   ];
 
   filteredConnectors = [...this.connectorTemplates];
 
-  constructor(
-    private workflowService: WorkflowService,
-    private connectorService: ConnectorService,
-    private http: HttpClient
-  ) { }
 
   ngOnInit() {
-    // Carrega a biblioteca Drawflow
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/drawflow@0.0.60/dist/drawflow.min.js';
     script.onload = () => {
@@ -193,17 +144,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     };
     document.head.appendChild(script);
 
-    // Carrega CSS do Drawflow
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 
-    // Carrega workflows salvos
     this.loadSavedWorkflows();
   }
 
   ngAfterViewInit() {
-    // Drawflow será inicializado quando o script carregar
   }
 
   initializeDrawflow() {
@@ -211,7 +159,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.editor = new Drawflow(this.drawflowContainer.nativeElement);
       this.editor.start();
 
-      // Eventos do editor
       this.editor.on('nodeSelected', (id: string) => {
         if (!this.isDragging) {
           this.onNodeSelected(id);
@@ -240,21 +187,18 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.updateStats();
       });
 
-      // Detectar início do drag
       this.drawflowContainer.nativeElement.addEventListener('mousedown', (e: MouseEvent) => {
         if (e.target && (e.target as HTMLElement).closest('.drawflow-node')) {
           this.isDragging = true;
         }
       });
 
-      // Detectar fim do drag
       this.drawflowContainer.nativeElement.addEventListener('mouseup', (e: MouseEvent) => {
         setTimeout(() => {
           this.isDragging = false;
         }, 50);
       });
 
-      // Adicionar evento de double click
       this.drawflowContainer.nativeElement.addEventListener('dblclick', (e: MouseEvent) => {
         const nodeElement = (e.target as HTMLElement).closest('.drawflow-node');
         if (nodeElement) {
@@ -335,30 +279,26 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (nodeData) {
       this.selectedNode = {
         id: id,
-        name: nodeData.name || 'Node sem nome',
+        name: nodeData.name || 'Unnamed Node',
         type: nodeData.class || 'unknown',
         inputs: nodeData.inputs || 0,
         outputs: nodeData.outputs || 0,
         config: nodeData.data || {}
       };
 
-      // Inicializa mappings para transform se não existir
       if (this.selectedNode.type === 'transform') {
         if (!this.transformMappings[id]) {
           this.transformMappings[id] = this.selectedNode.config.mappings || [];
         }
 
-        // Gera dados de exemplo se não há dados reais
         if (!this.getInputPreview(id)) {
           this.previewData[id] = this.generateSampleData();
         }
       }
 
-      // NÃO abre o dialog automaticamente - só com double click
     }
   }
-
-  // Novo método para double click
+  
   onNodeDoubleClick(id: string) {
     this.onNodeSelected(id);
     this.openConfigDialog();
@@ -366,13 +306,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   updateNodeProperties() {
     if (this.selectedNode && this.editor) {
-      // Atualiza as propriedades do node no editor
       this.editor.updateNodeDataFromId(this.selectedNode.id, this.selectedNode.config);
       console.log('Node properties updated:', this.selectedNode);
     }
   }
 
-  // Método chamado quando qualquer configuração muda
   onConfigChange() {
     this.updateNodeProperties();
   }
@@ -419,11 +357,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   clearWorkflow() {
-    if (this.editor && confirm('Tem certeza que deseja limpar o workflow?')) {
+    if (this.editor && confirm('Are you sure you want to clear the workflow?')) {
       this.editor.clear();
       this.selectedNode = null;
       this.updateStats();
-      this.workflowStatus = 'Limpo';
+      this.workflowStatus = 'Cleared';
     }
   }
 
@@ -437,50 +375,44 @@ export class AppComponent implements OnInit, AfterViewInit {
         createdAt: new Date().toISOString()
       };
 
-      // Salva no localStorage
       const saved = localStorage.getItem('circuit_craft_workflows');
       const workflows = saved ? JSON.parse(saved) : [];
       workflows.push(workflow);
       localStorage.setItem('circuit_craft_workflows', JSON.stringify(workflows));
 
-      this.workflowStatus = 'Salvo';
-      this.loadSavedWorkflows(); // Recarrega a lista
+      this.workflowStatus = 'Saved';
+      this.loadSavedWorkflows();
 
-      console.log('Workflow salvo:', workflow);
+      console.log('Workflow saved:', workflow);
     }
   }
 
-  // Novo método para carregar workflows salvos
   loadSavedWorkflows() {
     const saved = localStorage.getItem('circuit_craft_workflows');
     this.savedWorkflows = saved ? JSON.parse(saved) : [];
   }
 
-  // Novo método para abrir dialog de load
   openLoadDialog() {
     this.loadSavedWorkflows();
     this.showLoadDialog = true;
   }
 
-  // Novo método para fechar dialog de load
   closeLoadDialog() {
     this.showLoadDialog = false;
   }
 
-  // Novo método para carregar um workflow específico
   loadWorkflow(workflow: any) {
     if (this.editor) {
       this.workflowName = workflow.name;
       this.editor.import(workflow.data);
       this.updateStats();
-      this.workflowStatus = 'Carregado';
+      this.workflowStatus = 'Loaded';
       this.closeLoadDialog();
     }
   }
 
-  // Novo método para deletar um workflow salvo
   deleteWorkflow(workflowId: string) {
-    if (confirm('Tem certeza que deseja deletar este workflow?')) {
+    if (confirm('Are you sure you want to delete this workflow?')) {
       this.savedWorkflows = this.savedWorkflows.filter(w => w.id !== workflowId);
       localStorage.setItem('circuit_craft_workflows', JSON.stringify(this.savedWorkflows));
     }
@@ -489,43 +421,38 @@ export class AppComponent implements OnInit, AfterViewInit {
   async executeWorkflow() {
     if (!this.editor) return;
 
-    this.workflowStatus = 'Executando...';
+    this.workflowStatus = 'Executing...';
     this.executionResults = {};
-    this.displayDataResults = {}; // Reset display data
+    this.displayDataResults = {};
 
-    // Reset visual states
     this.resetNodeStates();
 
     try {
       const exportData = this.editor.export();
-      console.log('Iniciando execução do workflow:', exportData);
+      console.log('Starting workflow execution:', exportData);
 
-      // Converte dados do Drawflow para o formato do serviço
       const workflowData = this.convertDrawflowToWorkflow(exportData);
 
-      // Executa o workflow usando o serviço
       const result = await this.processWorkflowWithService(workflowData);
 
-      console.log('Resultado da execução:', result);
+      console.log('Execution result:', result);
       this.executionResults = result.results;
 
-      // Atualiza visual dos nodes com os resultados
       this.updateNodesWithResults();
 
-      this.workflowStatus = result.status === 'completed' ? 'Executado com sucesso' : 'Erro na execução';
+      this.workflowStatus = result.status === 'completed' ? 'Executed successfully' : 'Execution error';
 
       if (result.status === 'failed') {
-        console.error('Erros na execução:', result.errors);
+        console.error('Execution errors:', result.errors);
       }
 
     } catch (error) {
-      console.error('Erro na execução do workflow:', error);
-      this.workflowStatus = 'Erro na execução';
+      console.error('Workflow execution error:', error);
+      this.workflowStatus = 'Execution error';
     }
 
-    // Reset status após 3 segundos
     setTimeout(() => {
-      this.workflowStatus = 'Pronto';
+      this.workflowStatus = 'Ready';
     }, 3000);
   }
 
@@ -534,7 +461,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     const workflowNodes: any[] = [];
     const connections: any[] = [];
 
-    // Converte nodes
     Object.keys(nodes).forEach(nodeId => {
       const node = nodes[nodeId];
       workflowNodes.push({
@@ -547,7 +473,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         outputs: []
       });
 
-      // Converte conexões
       Object.keys(node.outputs || {}).forEach(outputKey => {
         const output = node.outputs[outputKey];
         Object.keys(output.connections || {}).forEach(connectionKey => {
@@ -577,24 +502,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     };
 
     try {
-      // Ordena nodes topologicamente para execução
       const sortedNodes = this.topologicalSort(workflowData.nodes, workflowData.connections);
 
       for (const node of sortedNodes) {
         try {
-          console.log(`Executando node: ${node.name} (${node.type})`);
+          console.log(`Executing node: ${node.name} (${node.type})`);
 
-          // Mostra visualmente que o node está executando
           this.setNodeExecuting(node.id);
 
           const result = await this.executeNode(node, executionResult.results, workflowData.connections);
           executionResult.results[node.id] = result;
-          console.log(`Node ${node.name} executado com sucesso:`, result);
+          console.log(`Node ${node.name} executed successfully:`, result);
         } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
           executionResult.errors[node.id] = errorMsg;
           executionResult.results[node.id + '_error'] = errorMsg;
-          console.error(`Erro no node ${node.name}:`, errorMsg);
+          console.error(`Error in node ${node.name}:`, errorMsg);
           executionResult.status = 'failed';
           break;
         }
@@ -606,7 +529,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     } catch (error) {
       executionResult.status = 'failed';
-      const errorMsg = error instanceof Error ? error.message : 'Erro na execução do workflow';
+      const errorMsg = error instanceof Error ? error.message : 'Workflow execution error';
       executionResult.errors['workflow'] = errorMsg;
     }
 
@@ -622,7 +545,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       case 'display-data':
         const inputData = this.getInputData(node, previousResults, connections);
         const displayResult = this.executeDisplay(inputData, node.data);
-        // Armazena os dados para visualização
         this.displayDataResults[node.id] = {
           data: inputData,
           format: node.data.format || 'table',
@@ -639,44 +561,41 @@ export class AppComponent implements OnInit, AfterViewInit {
         return this.executeTransform(transformInput, node.data);
 
       default:
-        return { message: `Node tipo ${node.type} executado`, data: node.data };
+        return { message: `Node type ${node.type} executed`, data: node.data };
     }
   }
 
   private async executeHttpRequest(config: any): Promise<any> {
     try {
       if (!config.url) {
-        throw new Error('URL é obrigatória para HTTP Request');
+        throw new Error('URL is required for HTTP Request');
       }
 
-      console.log('Executando HTTP Request:', config);
+      console.log('Executing HTTP Request:', config);
 
       const options: any = {
         method: config.method || 'GET',
         headers: {}
       };
 
-      // Parse headers se fornecido
       if (config.headers) {
         try {
           const headersObj = typeof config.headers === 'string' ? JSON.parse(config.headers) : config.headers;
           options.headers = headersObj;
         } catch (e) {
-          console.warn('Headers inválidos, usando padrão');
+          console.warn('Invalid headers, using default');
         }
       }
 
-      // Adiciona body para métodos POST/PUT
       if ((config.method === 'POST' || config.method === 'PUT') && config.body) {
         try {
           options.body = typeof config.body === 'string' ? config.body : JSON.stringify(config.body);
           options.headers['Content-Type'] = 'application/json';
         } catch (e) {
-          console.warn('Body inválido');
+          console.warn('Invalid body');
         }
       }
 
-      // Faz a requisição usando fetch
       const response = await fetch(config.url, options);
       const data = await response.json();
 
@@ -688,22 +607,21 @@ export class AppComponent implements OnInit, AfterViewInit {
       };
 
     } catch (error) {
-      throw new Error(`Erro na requisição HTTP: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      throw new Error(`HTTP request error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   private executeDisplay(data: any, config: any): any {
-    console.log('Exibindo dados:', data, 'no formato:', config.format);
+    console.log('Displaying data:', data, 'in format:', config.format);
     return {
       format: config.format || 'table',
       data: data,
       displayedAt: new Date().toISOString(),
-      message: 'Dados exibidos com sucesso'
+      message: 'Data displayed successfully'
     };
   }
 
-  private executeFilter(data: any, condition: string): any {
-    // Implementação básica de filtro
+  private executeFilter(data: any, condition: string): any {  
     if (!Array.isArray(data)) {
       return data;
     }
@@ -712,8 +630,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       return data;
     }
 
-    // Para demo, retorna todos os itens
-    console.log('Aplicando filtro:', condition, 'aos dados:', data);
+    console.log('Applying filter:', condition, 'to data:', data);
     return data;
   }
 
@@ -748,15 +665,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
 
       const mappingObj = config.mapping ? JSON.parse(config.mapping) : {};
-      console.log('Transformando dados:', data, 'com mapping:', mappingObj);
+      console.log('Transforming data:', data, 'with mapping:', mappingObj);
       return { ...data, transformed: true, mapping: mappingObj };
     } catch (error) {
-      throw new Error(`Erro na transformação: ${error}`);
+      throw new Error(`Transform error: ${error}`);
     }
   }
 
   private getInputData(node: any, previousResults: { [nodeId: string]: any }, connections: any[]): any {
-    // Encontra conexões que chegam neste node
     const inputConnections = connections.filter(conn => conn.targetNode === node.id);
 
     if (inputConnections.length === 0) {
@@ -782,7 +698,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       visited.add(nodeId);
 
-      // Visita dependências primeiro
       connections
         .filter(conn => conn.targetNode === nodeId)
         .forEach(conn => visit(conn.sourceNode));
@@ -793,14 +708,12 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     };
 
-    // Começa pelos nodes sem dependências (sources)
     const sourceNodes = nodes.filter(node =>
       !connections.some(conn => conn.targetNode === node.id)
     );
 
     sourceNodes.forEach(node => visit(node.id));
 
-    // Visita nodes restantes
     nodes.forEach(node => visit(node.id));
 
     return result;
@@ -814,17 +727,14 @@ export class AppComponent implements OnInit, AfterViewInit {
       const nodeElement = document.querySelector(`#node-${nodeId}`);
 
       if (nodeElement) {
-        // Remove estados anteriores
         nodeElement.classList.remove('executing', 'success', 'error');
 
-        // Adiciona novo estado baseado no resultado
         if (result && !this.executionResults[nodeId + '_error']) {
           nodeElement.classList.add('success');
         } else if (this.executionResults[nodeId + '_error']) {
           nodeElement.classList.add('error');
         }
 
-        // Atualiza o status dot se existe
         const statusDot = nodeElement.querySelector('.status-dot');
         if (statusDot) {
           if (result && !this.executionResults[nodeId + '_error']) {
@@ -837,7 +747,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Método para indicar que um node está executando
   private setNodeExecuting(nodeId: string) {
     const nodeElement = document.querySelector(`#node-${nodeId}`);
     if (nodeElement) {
@@ -851,7 +760,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Método para resetar estados dos nodes
   private resetNodeStates() {
     const nodeElements = document.querySelectorAll('.drawflow-node');
     nodeElements.forEach(nodeElement => {
@@ -934,8 +842,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   generateSampleData(): any {
     return {
       id: 1,
-      name: "João Silva",
-      email: "joao@example.com",
+      name: "John Silva",
+      email: "john@example.com",
       age: 30,
       active: true,
       profile: {
@@ -1042,7 +950,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Método para obter ícone do node baseado no tipo
   getNodeIcon(type: string | undefined): string {
     const icons: { [key: string]: string } = {
       'http-request': '🌐',
@@ -1060,7 +967,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     return icons[type || ''] || '📦';
   }
 
-  // Método para obter nome de exibição do node
   getNodeDisplayName(type: string | undefined): string {
     const names: { [key: string]: string } = {
       'http-request': 'HTTP Request',
@@ -1078,18 +984,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     return names[type || ''] || 'Unknown Node';
   }
 
-  // Método para adicionar nodes rapidamente
   addQuickStartNode(type: string) {
     const connector = this.connectorTemplates.find(c => c.id === type);
     if (connector && this.editor) {
-      // Adiciona o node no centro do canvas
       const centerX = this.drawflowContainer.nativeElement.offsetWidth / 2;
       const centerY = this.drawflowContainer.nativeElement.offsetHeight / 2;
       this.createNode(connector, centerX - 100, centerY - 50);
     }
   }
 
-  // Método para extrair colunas de dados para tabela
   getTableColumns(data: any): string[] {
     if (!data) return [];
 
@@ -1102,7 +1005,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     return [];
   }
 
-  // Método para extrair linhas de dados para tabela
   getTableRows(data: any): any[] {
     if (!data) return [];
 

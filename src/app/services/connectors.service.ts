@@ -11,7 +11,7 @@ export class ConnectorService {
       name: 'HTTP Request',
       category: 'HTTP & APIs',
       icon: '🌐',
-      description: 'Executa requisições HTTP para APIs externas',
+      description: 'Executes HTTP requests to external APIs',
       version: '1.0.0',
       inputs: [
         {
@@ -19,7 +19,7 @@ export class ConnectorService {
           name: 'Trigger',
           type: 'any',
           required: false,
-          description: 'Dispara a execução da requisição'
+          description: 'Triggers the request execution'
         }
       ],
       outputs: [
@@ -28,48 +28,24 @@ export class ConnectorService {
           name: 'Response',
           type: 'object',
           required: true,
-          description: 'Resposta da requisição HTTP'
+          description: 'HTTP request response'
         }
       ],
       configSchema: {
-        url: { type: 'string', required: true, description: 'URL da API' },
+        url: { type: 'string', required: true, description: 'API URL' },
         method: { type: 'string', enum: ['GET', 'POST', 'PUT', 'DELETE'], default: 'GET' },
-        headers: { type: 'object', description: 'Headers da requisição' },
-        body: { type: 'object', description: 'Corpo da requisição (para POST/PUT)' },
-        timeout: { type: 'number', default: 30000, description: 'Timeout em ms' }
+        headers: { type: 'object', description: 'Request headers' },
+        body: { type: 'object', description: 'Request body (for POST/PUT)' },
+        timeout: { type: 'number', default: 30000, description: 'Timeout in ms' }
       },
-      documentation: 'Permite fazer requisições HTTP para qualquer API REST.',
+      documentation: 'Allows making HTTP requests to any REST API.',
       examples: [
         {
-          name: 'GET simples',
+          name: 'Simple GET',
           config: { url: 'https://jsonplaceholder.typicode.com/posts/1', method: 'GET' }
         }
       ]
     },
-    {
-      id: 'webhook-trigger',
-      name: 'Webhook Trigger',
-      category: 'Triggers',
-      icon: '🔗',
-      description: 'Inicia workflows através de webhooks',
-      version: '1.0.0',
-      inputs: [],
-      outputs: [
-        {
-          id: 'payload',
-          name: 'Payload',
-          type: 'object',
-          required: true,
-          description: 'Dados recebidos via webhook'
-        }
-      ],
-      configSchema: {
-        path: { type: 'string', required: true, description: 'Caminho do webhook' },
-        method: { type: 'string', enum: ['POST', 'GET', 'PUT'], default: 'POST' },
-        authentication: { type: 'boolean', default: false, description: 'Requer autenticação' }
-      }
-    }
-    // Mais conectores podem ser adicionados aqui
   ];
 
   getConnectors(): ConnectorTemplate[] {
@@ -98,7 +74,6 @@ export class ConnectorService {
     return Array.from(categories).sort();
   }
 
-  // Método para registrar conectores customizados
   registerCustomConnector(connector: ConnectorTemplate): void {
     const existingIndex = this.connectors.findIndex(c => c.id === connector.id);
     if (existingIndex >= 0) {
@@ -111,29 +86,28 @@ export class ConnectorService {
   validateConnectorConfig(connectorId: string, config: any): { valid: boolean; errors: string[] } {
     const connector = this.getConnectorById(connectorId);
     if (!connector) {
-      return { valid: false, errors: ['Connector não encontrado'] };
+      return { valid: false, errors: ['Connector not found'] };
     }
 
     const errors: string[] = [];
     const schema = connector.configSchema;
 
-    // Validação básica baseada no schema
     Object.keys(schema).forEach(key => {
       const fieldSchema = schema[key];
       const value = config[key];
 
       if (fieldSchema.required && (value === undefined || value === null || value === '')) {
-        errors.push(`Campo '${key}' é obrigatório`);
+        errors.push(`Field '${key}' is required`);
       }
 
       if (fieldSchema.enum && value && !fieldSchema.enum.includes(value)) {
-        errors.push(`Campo '${key}' deve ser um dos valores: ${fieldSchema.enum.join(', ')}`);
+        errors.push(`Field '${key}' must be one of: ${fieldSchema.enum.join(', ')}`);
       }
 
       if (fieldSchema.type && value !== undefined) {
         const actualType = Array.isArray(value) ? 'array' : typeof value;
         if (actualType !== fieldSchema.type && fieldSchema.type !== 'any') {
-          errors.push(`Campo '${key}' deve ser do tipo ${fieldSchema.type}`);
+          errors.push(`Field '${key}' must be of type ${fieldSchema.type}`);
         }
       }
     });
