@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { ExecutionResult } from './types';
@@ -32,7 +32,7 @@ interface SimpleConnectorTemplate {
   templateUrl: './app.component.html',
   styleUrl: "./app.component.scss"
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit {
   @ViewChild('drawflowContainer', { static: false }) drawflowContainer!: ElementRef;
 
   private editor: any;
@@ -151,9 +151,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.loadSavedWorkflows();
   }
 
-  ngAfterViewInit() {
-  }
-
   initializeDrawflow() {
     if (this.drawflowContainer) {
       this.editor = new Drawflow(this.drawflowContainer.nativeElement);
@@ -255,20 +252,10 @@ export class AppComponent implements OnInit, AfterViewInit {
           </div>
           <div class="node-title">
             <span class="node-name">${connector.name}</span>
-            <span class="node-type">${connector.category}</span>
-          </div>
-          <div class="node-status">
-            <div class="status-dot"></div>
           </div>
         </div>
         <div class="node-content">
           <div class="node-description">${connector.description}</div>
-          <div class="node-meta">
-            <div class="io-indicator">
-              ${connector.inputs > 0 ? `<span class="input-count">${connector.inputs} <small>in</small></span>` : ''}
-              ${connector.outputs > 0 ? `<span class="output-count">${connector.outputs} <small>out</small></span>` : ''}
-            </div>
-          </div>
         </div>
       </div>
     `;
