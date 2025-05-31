@@ -1,10 +1,10 @@
-// app.component.ts
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WorkflowService, ExecutionResult } from './services/workflow.service';
-import { ConnectorService, ConnectorTemplate } from './services/connectors.service';
+import { WorkflowService } from './services/workflow.service';
+import { ConnectorService } from './services/connectors.service';
 import { HttpClient } from '@angular/common/http';
+import { ExecutionResult } from './types';
 
 declare var Drawflow: any;
 
@@ -182,7 +182,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     private workflowService: WorkflowService,
     private connectorService: ConnectorService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Carrega a biblioteca Drawflow
@@ -196,7 +196,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Carrega CSS do Drawflow
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://cdn.jsdelivr.net/npm/drawflow@0.0.60/dist/drawflow.min.css';
     document.head.appendChild(link);
 
     // Carrega workflows salvos
@@ -342,13 +341,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         outputs: nodeData.outputs || 0,
         config: nodeData.data || {}
       };
-      
+
       // Inicializa mappings para transform se não existir
       if (this.selectedNode.type === 'transform') {
         if (!this.transformMappings[id]) {
           this.transformMappings[id] = this.selectedNode.config.mappings || [];
         }
-        
+
         // Gera dados de exemplo se não há dados reais
         if (!this.getInputPreview(id)) {
           this.previewData[id] = this.generateSampleData();
@@ -443,7 +442,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       const workflows = saved ? JSON.parse(saved) : [];
       workflows.push(workflow);
       localStorage.setItem('circuit_craft_workflows', JSON.stringify(workflows));
-      
+
       this.workflowStatus = 'Salvo';
       this.loadSavedWorkflows(); // Recarrega a lista
 
@@ -493,7 +492,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.workflowStatus = 'Executando...';
     this.executionResults = {};
     this.displayDataResults = {}; // Reset display data
-    
+
     // Reset visual states
     this.resetNodeStates();
 
@@ -503,13 +502,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       // Converte dados do Drawflow para o formato do serviço
       const workflowData = this.convertDrawflowToWorkflow(exportData);
-      
+
       // Executa o workflow usando o serviço
       const result = await this.processWorkflowWithService(workflowData);
-      
+
       console.log('Resultado da execução:', result);
       this.executionResults = result.results;
-      
+
       // Atualiza visual dos nodes com os resultados
       this.updateNodesWithResults();
 
@@ -584,10 +583,10 @@ export class AppComponent implements OnInit, AfterViewInit {
       for (const node of sortedNodes) {
         try {
           console.log(`Executando node: ${node.name} (${node.type})`);
-          
+
           // Mostra visualmente que o node está executando
           this.setNodeExecuting(node.id);
-          
+
           const result = await this.executeNode(node, executionResult.results, workflowData.connections);
           executionResult.results[node.id] = result;
           console.log(`Node ${node.name} executado com sucesso:`, result);
@@ -708,7 +707,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!Array.isArray(data)) {
       return data;
     }
-    
+
     if (!condition) {
       return data;
     }
@@ -722,10 +721,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     try {
       if (config.mappings && Array.isArray(config.mappings)) {
         const result: any = {};
-        
+
         config.mappings.forEach((mapping: any) => {
           if (!mapping.enabled || !mapping.targetField) return;
-          
+
           switch (mapping.type) {
             case 'direct':
               if (mapping.sourceField) {
@@ -744,10 +743,10 @@ export class AppComponent implements OnInit, AfterViewInit {
               break;
           }
         });
-        
+
         return result;
       }
-      
+
       const mappingObj = config.mapping ? JSON.parse(config.mapping) : {};
       console.log('Transformando dados:', data, 'com mapping:', mappingObj);
       return { ...data, transformed: true, mapping: mappingObj };
@@ -759,7 +758,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private getInputData(node: any, previousResults: { [nodeId: string]: any }, connections: any[]): any {
     // Encontra conexões que chegam neste node
     const inputConnections = connections.filter(conn => conn.targetNode === node.id);
-    
+
     if (inputConnections.length === 0) {
       return null;
     }
@@ -795,7 +794,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     };
 
     // Começa pelos nodes sem dependências (sources)
-    const sourceNodes = nodes.filter(node => 
+    const sourceNodes = nodes.filter(node =>
       !connections.some(conn => conn.targetNode === node.id)
     );
 
@@ -813,18 +812,18 @@ export class AppComponent implements OnInit, AfterViewInit {
     Object.keys(this.executionResults).forEach(nodeId => {
       const result = this.executionResults[nodeId];
       const nodeElement = document.querySelector(`#node-${nodeId}`);
-      
+
       if (nodeElement) {
         // Remove estados anteriores
         nodeElement.classList.remove('executing', 'success', 'error');
-        
+
         // Adiciona novo estado baseado no resultado
         if (result && !this.executionResults[nodeId + '_error']) {
           nodeElement.classList.add('success');
         } else if (this.executionResults[nodeId + '_error']) {
           nodeElement.classList.add('error');
         }
-        
+
         // Atualiza o status dot se existe
         const statusDot = nodeElement.querySelector('.status-dot');
         if (statusDot) {
@@ -844,7 +843,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (nodeElement) {
       nodeElement.classList.remove('success', 'error');
       nodeElement.classList.add('executing');
-      
+
       const statusDot = nodeElement.querySelector('.status-dot');
       if (statusDot) {
         (statusDot as HTMLElement).style.background = '#3b82f6';
@@ -857,7 +856,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const nodeElements = document.querySelectorAll('.drawflow-node');
     nodeElements.forEach(nodeElement => {
       nodeElement.classList.remove('executing', 'success', 'error');
-      
+
       const statusDot = nodeElement.querySelector('.status-dot');
       if (statusDot) {
         (statusDot as HTMLElement).style.background = '#9ca3af';
@@ -888,12 +887,12 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   getInputPreview(nodeId: string): any {
     if (!this.editor) return null;
-    
+
     const connections = this.getNodeConnections();
     const inputConnections = connections.filter((conn: any) => conn.targetNode === nodeId);
-    
+
     if (inputConnections.length === 0) return null;
-    
+
     const inputData: any[] = [];
     inputConnections.forEach((conn: any) => {
       if (this.executionResults[conn.sourceNode]) {
@@ -902,13 +901,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         inputData.push(this.previewData[conn.sourceNode]);
       }
     });
-    
+
     return inputData.length === 1 ? inputData[0] : inputData;
   }
 
   private getNodeConnections(): any[] {
     if (!this.editor) return [];
-    
+
     const exportData = this.editor.export();
     const nodes = exportData.drawflow.Home.data;
     const connections: any[] = [];
@@ -956,7 +955,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!this.transformMappings[nodeId]) {
       this.transformMappings[nodeId] = [];
     }
-    
+
     this.transformMappings[nodeId].push({
       sourceField: '',
       targetField: '',
@@ -964,7 +963,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       value: '',
       enabled: true
     });
-    
+
     this.updateTransformConfig(nodeId);
   }
 
@@ -984,19 +983,19 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   extractAvailableFields(data: any, prefix: string = ''): string[] {
     if (!data || typeof data !== 'object') return [];
-    
+
     const fields: string[] = [];
-    
+
     Object.keys(data).forEach(key => {
       const fieldPath = prefix ? `${prefix}.${key}` : key;
       fields.push(fieldPath);
-      
+
       if (data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])) {
         const nestedFields = this.extractAvailableFields(data[key], fieldPath);
         fields.push(...nestedFields);
       }
     });
-    
+
     return fields;
   }
 
@@ -1007,14 +1006,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   generateTransformPreview(nodeId: string): any {
     const inputData = this.getInputPreview(nodeId);
     const mappings = this.transformMappings[nodeId];
-    
+
     if (!inputData || !mappings) return null;
-    
+
     const result: any = {};
-    
+
     mappings.forEach(mapping => {
       if (!mapping.enabled || !mapping.targetField) return;
-      
+
       switch (mapping.type) {
         case 'direct':
           if (mapping.sourceField) {
@@ -1029,7 +1028,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           break;
       }
     });
-    
+
     return result;
   }
 
@@ -1093,26 +1092,26 @@ export class AppComponent implements OnInit, AfterViewInit {
   // Método para extrair colunas de dados para tabela
   getTableColumns(data: any): string[] {
     if (!data) return [];
-    
+
     if (Array.isArray(data) && data.length > 0) {
       return Object.keys(data[0]);
     } else if (typeof data === 'object') {
       return Object.keys(data);
     }
-    
+
     return [];
   }
 
   // Método para extrair linhas de dados para tabela
   getTableRows(data: any): any[] {
     if (!data) return [];
-    
+
     if (Array.isArray(data)) {
       return data;
     } else if (typeof data === 'object') {
       return [data];
     }
-    
+
     return [];
   }
 }

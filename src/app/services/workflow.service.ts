@@ -1,45 +1,6 @@
-// src/app/services/workflow.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-
-export interface WorkflowNode {
-  id: string;
-  type: string;
-  name: string;
-  position: { x: number; y: number };
-  data: any;
-  inputs: NodeConnection[];
-  outputs: NodeConnection[];
-}
-
-export interface NodeConnection {
-  id: string;
-  sourceNode: string;
-  targetNode: string;
-  sourceOutput: string;
-  targetInput: string;
-}
-
-export interface Workflow {
-  id: string;
-  name: string;
-  description: string;
-  nodes: WorkflowNode[];
-  connections: NodeConnection[];
-  createdAt: Date;
-  updatedAt: Date;
-  status: 'draft' | 'active' | 'paused' | 'error';
-}
-
-export interface ExecutionResult {
-  workflowId: string;
-  executionId: string;
-  status: 'running' | 'completed' | 'failed';
-  startTime: Date;
-  endTime?: Date;
-  results: { [nodeId: string]: any };
-  errors: { [nodeId: string]: string };
-}
+import { BehaviorSubject } from 'rxjs';
+import { ExecutionResult, NodeConnection, Workflow, WorkflowNode } from '../types';
 
 @Injectable({
   providedIn: 'root'

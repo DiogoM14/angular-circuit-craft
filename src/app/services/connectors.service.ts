@@ -1,27 +1,5 @@
-// src/app/services/connector.service.ts
 import { Injectable } from '@angular/core';
-
-export interface ConnectorTemplate {
-  id: string;
-  name: string;
-  category: string;
-  icon: string;
-  description: string;
-  version: string;
-  inputs: ConnectorPort[];
-  outputs: ConnectorPort[];
-  configSchema: any;
-  documentation?: string;
-  examples?: any[];
-}
-
-export interface ConnectorPort {
-  id: string;
-  name: string;
-  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'any';
-  required: boolean;
-  description: string;
-}
+import { ConnectorTemplate } from '../types';
 
 @Injectable({
   providedIn: 'root'
