@@ -1050,6 +1050,7 @@ body {
       box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       min-width: 200px;
       overflow: visible;
+      padding: 0;
 
       &:hover {
         border-color: #a5b4fc;
@@ -1062,6 +1063,11 @@ body {
         box-shadow: 0 0 0 4px #dbeafe, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         background: white;
       }
+    }
+
+    .drawflow-delete {
+      background: #d24141;
+      border: none;
     }
 
     .connection {
@@ -1085,25 +1091,29 @@ body {
     border-radius: 50%;
     border: 3px solid #3b82f6;
     background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
-    box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10), 0 0px 0px 0 #fff;
+    box-shadow: 0 2px 8px 0 rgba(59, 130, 246, 0.10), 0 0px 0px 0 #fff;
     position: absolute;
     z-index: 2;
     transition: box-shadow 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
     outline: none;
     cursor: pointer;
   }
+
   /* Middle connectors (left/right) */
   .drawflow .drawflow-node .input:not(.top),
   .drawflow .drawflow-node .output:not(.top) {
     top: 50%;
     transform: translateY(-50%);
   }
+
   .drawflow .drawflow-node .input:not(.top) {
     left: -10px;
   }
+
   .drawflow .drawflow-node .output:not(.top) {
     right: -10px;
   }
+
   /* Top connectors */
   .drawflow .drawflow-node .input.top,
   .drawflow .drawflow-node .output.top {
@@ -1111,19 +1121,21 @@ body {
     left: 50%;
     transform: translateX(-50%);
   }
+
   .drawflow .drawflow-node .input:hover,
   .drawflow .drawflow-node .output:hover,
   .drawflow .drawflow-node .input:focus-visible,
   .drawflow .drawflow-node .output:focus-visible {
     background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 100%);
-    box-shadow: 0 0 0 6px rgba(59,130,246,0.18), 0 2px 8px 0 rgba(59,130,246,0.10);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.18), 0 2px 8px 0 rgba(59, 130, 246, 0.10);
     border-color: #2563eb;
   }
+
   .drawflow .drawflow-node .input.connected,
   .drawflow .drawflow-node .output.connected {
     background: linear-gradient(135deg, #10b981 0%, #6ee7b7 100%);
     border-color: #10b981;
-    box-shadow: 0 0 0 4px #bbf7d0, 0 2px 8px 0 rgba(16,185,129,0.10);
+    box-shadow: 0 0 0 4px #bbf7d0, 0 2px 8px 0 rgba(16, 185, 129, 0.10);
   }
 
   /* =================================
@@ -1384,9 +1396,12 @@ body {
   }
 
   @keyframes pulse-blue {
-    0%, 100% {
+
+    0%,
+    100% {
       opacity: 1;
     }
+
     50% {
       opacity: 0.7;
     }
@@ -1396,9 +1411,11 @@ body {
     0% {
       opacity: 1;
     }
+
     50% {
       opacity: 0.7;
     }
+
     100% {
       opacity: 1;
     }
@@ -1408,15 +1425,19 @@ body {
     0% {
       opacity: 1;
     }
+
     25% {
       opacity: 0.7;
     }
+
     50% {
       opacity: 1;
     }
+
     75% {
       opacity: 0.7;
     }
+
     100% {
       opacity: 1;
     }
@@ -1426,6 +1447,7 @@ body {
    CONNECTION POINTS ENHANCEMENT
    ================================= */
   .drawflow-node {
+
     .input,
     .output {
       background: white;
