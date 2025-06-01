@@ -131,3 +131,6 @@ For questions or support, reach out to [DiogoM14](mailto:diogomartins200214@gmai
 ## 📝 Notes
 
 This README was created based on the project's code structure and dependencies. The Angular Circuit Craft application is built around a visual workflow editor using the Drawflow library, with a modern UI implemented using Angular, Tailwind CSS, and DaisyUI.
+
+## DeepWiki
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DiogoM14/angular-circuit-craft)
