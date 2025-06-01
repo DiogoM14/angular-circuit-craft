@@ -1,0 +1,61 @@
+<header class="app-header">
+  <div class="header-left">
+    <div class="logo-section">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <h1>Circuit Craft</h1>
+      </div>
+    </div>
+    
+    <div class="workflow-title-section">
+      <input
+        type="text"
+        [value]="workflowName"
+        (input)="onWorkflowNameChange($any($event.target).value)"
+        placeholder="Untitled Workflow"
+        class="workflow-title-input"
+      >
+    </div>
+  </div>
+
+  <div class="header-center">
+    <div class="execution-controls">
+      <button class="btn btn-execute" (click)="onExecuteWorkflow()">
+        <span>▶️</span>
+        Run
+      </button>
+      <button class="btn btn-secondary" (click)="onClearWorkflow()">
+        <span>🗑️</span>
+        Clear
+      </button>
+      <button class="btn btn-outline" (click)="onSaveWorkflow()">
+        <span>💾</span>
+        Save
+      </button>
+      <button class="btn btn-outline" (click)="onOpenLoadDialog()">
+        <span>📂</span>
+        Load
+      </button>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="canvas-controls">
+      <button class="btn btn-icon" (click)="onZoomOut()" title="Zoom Out">
+        <i class="icon">🔍-</i>
+      </button>
+      <span class="zoom-display">{{ currentZoom }}%</span>
+      <button class="btn btn-icon" (click)="onZoomIn()" title="Zoom In">
+        <i class="icon">🔍+</i>
+      </button>
+      <button class="btn btn-icon" (click)="onResetZoom()" title="Fit to Screen">
+        <i class="icon">⚡</i>
+      </button>
+    </div>
+    
+    <div class="status-indicator" [class]="workflowStatus.toLowerCase().replace(' ', '-')">
+      <div class="status-dot"></div>
+      <span>{{ workflowStatus }}</span>
+    </div>
+  </div>
+</header>

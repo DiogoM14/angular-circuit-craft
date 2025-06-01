@@ -1,0 +1,44 @@
+<aside class="sidebar" [class.collapsed]="false">
+  <div class="sidebar-header">
+    <h3>Components</h3>
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Search components..."
+        class="search-input"
+        [value]="searchTerm"
+        (input)="onSearchTermChange($any($event.target).value); onFilterConnectors()"
+      >
+      <i class="search-icon">🔍</i>
+    </div>
+  </div>
+
+  <div class="components-grid">
+    <div *ngFor="let category of categories" class="component-category">
+      <div class="category-header" (click)="onToggleCategory(category.name)">
+        <span class="category-icon">{{ category.expanded ? '📂' : '📁' }}</span>
+        <span class="category-name">{{ category.name }}</span>
+        <span class="category-count">({{ getFilteredConnectors(category.name).length }})</span>
+      </div>
+
+      <div *ngIf="category.expanded" class="category-components">
+        <div
+          *ngFor="let connector of getFilteredConnectors(category.name)"
+          class="component-card"
+          draggable="true"
+          (dragstart)="onDragStart($event, connector)"
+        >
+          <div class="component-icon">{{ connector.icon }}</div>
+          <div class="component-info">
+            <div class="component-name">{{ connector.name }}</div>
+            <div class="component-description">{{ connector.description }}</div>
+          </div>
+          <div class="component-meta">
+            <span class="input-count" *ngIf="connector.inputs > 0">{{ connector.inputs }}📥</span>
+            <span class="output-count" *ngIf="connector.outputs > 0">{{ connector.outputs }}📤</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside> 

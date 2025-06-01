@@ -1,541 +1,607 @@
 <div class="circuit-craft-app">
-      <header class="app-header">
-        <div class="header-left">
-          <div class="logo-section">
-            <div class="logo-icon">⚡</div>
-            <div class="logo-text">
-              <h1>Circuit Craft</h1>
-            </div>
+  <app-header
+    [workflowName]="workflowName"
+    [workflowStatus]="workflowStatus"
+    [currentZoom]="currentZoom"
+    [nodeCount]="nodeCount"
+    [connectionCount]="connectionCount"
+    (workflowNameChange)="workflowName = $event"
+    (executeWorkflow)="executeWorkflow()"
+    (clearWorkflow)="clearWorkflow()"
+    (saveWorkflow)="saveWorkflow()"
+    (openLoadDialog)="openLoadDialog()"
+    (zoomIn)="zoomIn()"
+    (zoomOut)="zoomOut()"
+    (resetZoom)="resetZoom()"
+  />
+
+  <div class="app-workspace">
+    <app-sidebar
+      [searchTerm]="searchTerm"
+      [categories]="categories"
+      [filteredConnectors]="filteredConnectors"
+      [connectorTemplates]="connectorTemplates"
+      (searchTermChange)="searchTerm = $event"
+      (filterConnectors)="filterConnectors()"
+      (toggleCategory)="toggleCategory($event)"
+      (dragStart)="onDragStart($event.event, $event.connector)"
+    />
+
+    <app-canvas
+      [selectedNode]="selectedNode"
+      [nodeCount]="nodeCount"
+      (drop)="onDrop($event)"
+      (dragOver)="onDragOver($event)"
+      (openConfigDialog)="openConfigDialog()"
+      (drawflowContainerReady)="drawflowContainer = $event"
+    />
+  </div>
+
+  <div class="dialog-overlay" *ngIf="showConfigDialog" (click)="closeConfigDialog()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <div class="dialog-header-content">
+          <div class="node-type-indicator" [attr.data-type]="selectedNode?.type">
+            <span class="node-icon">{{ getNodeIcon(selectedNode?.type) }}</span>
           </div>
-          
-          <div class="workflow-title-section">
+          <div class="dialog-title-section">
+            <h2>{{ getNodeDisplayName(selectedNode?.type) }}</h2>
+            <p>Configure your node settings</p>
+          </div>
+        </div>
+        <button class="dialog-close-btn" (click)="closeConfigDialog()">
+          <i class="icon">✕</i>
+        </button>
+      </div>
+
+      <div class="dialog-body" *ngIf="selectedNode">
+        <div class="config-section">
+          <div class="section-header">
+            <h3>Basic Information</h3>
+          </div>
+          <div class="form-group">
+            <label>Node Name</label>
             <input
               type="text"
-              [(ngModel)]="workflowName"
-              placeholder="Untitled Workflow"
-              class="workflow-title-input"
+              [(ngModel)]="selectedNode.name"
+              (ngModelChange)="onConfigChange()"
+              class="form-input"
+              placeholder="Enter node name..."
             >
           </div>
         </div>
 
-        <div class="header-center">
-          <div class="execution-controls">
-            <button class="btn btn-execute" (click)="executeWorkflow()">
-              <span>▶️</span>
-              Run
-            </button>
-            <button class="btn btn-secondary" (click)="clearWorkflow()">
-              <span>🗑️</span>
-              Clear
-            </button>
-            <button class="btn btn-outline" (click)="saveWorkflow()">
-              <span>💾</span>
-              Save
-            </button>
-            <button class="btn btn-outline" (click)="openLoadDialog()">
-              <span>📂</span>
-              Load
-            </button>
-          </div>
-        </div>
-
-        <div class="header-right">
-          <div class="canvas-controls">
-            <button class="btn btn-icon" (click)="zoomOut()" title="Zoom Out">
-              <i class="icon">🔍-</i>
-            </button>
-            <span class="zoom-display">{{ currentZoom }}%</span>
-            <button class="btn btn-icon" (click)="zoomIn()" title="Zoom In">
-              <i class="icon">🔍+</i>
-            </button>
-            <button class="btn btn-icon" (click)="resetZoom()" title="Fit to Screen">
-              <i class="icon">⚡</i>
-            </button>
-          </div>
-          
-          <div class="status-indicator" [class]="workflowStatus.toLowerCase().replace(' ', '-')">
-            <div class="status-dot"></div>
-            <span>{{ workflowStatus }}</span>
-          </div>
-        </div>
-      </header>
-
-      <div class="app-workspace">
-        <aside class="sidebar" [class.collapsed]="false">
-          <div class="sidebar-header">
-            <h3>Components</h3>
-            <div class="search-container">
-              <input
-                type="text"
-                placeholder="Search components..."
-                class="search-input"
-                [(ngModel)]="searchTerm"
-                (input)="filterConnectors()"
-              >
-              <i class="search-icon">🔍</i>
-            </div>
+        <div class="config-section" *ngIf="selectedNode?.type === 'display-data'">
+          <div class="section-header">
+            <h3>📊 Data Visualization</h3>
+            <span class="section-badge">Output</span>
           </div>
 
-          <div class="components-grid">
-            <div *ngFor="let category of categories" class="component-category">
-              <div class="category-header" (click)="toggleCategory(category.name)">
-                <span class="category-icon">{{ category.expanded ? '📂' : '📁' }}</span>
-                <span class="category-name">{{ category.name }}</span>
-                <span class="category-count">({{ getFilteredConnectors(category.name).length }})</span>
-              </div>
-
-              <div *ngIf="category.expanded" class="category-components">
-                <div
-                  *ngFor="let connector of getFilteredConnectors(category.name)"
-                  class="component-card"
-                  draggable="true"
-                  (dragstart)="onDragStart($event, connector)"
-                >
-                  <div class="component-icon">{{ connector.icon }}</div>
-                  <div class="component-info">
-                    <div class="component-name">{{ connector.name }}</div>
-                    <div class="component-description">{{ connector.description }}</div>
-                  </div>
-                  <div class="component-meta">
-                    <span class="input-count" *ngIf="connector.inputs > 0">{{ connector.inputs }}📥</span>
-                    <span class="output-count" *ngIf="connector.outputs > 0">{{ connector.outputs }}📤</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <main class="canvas-container">
-          <div class="canvas-toolbar">
-            <div class="toolbar-left">
-              <div class="node-selection-info" *ngIf="selectedNode">
-                <div class="selected-node-badge">
-                  <span class="node-icon">{{ getNodeIcon(selectedNode.type) }}</span>
-                  <span class="node-name">{{ selectedNode.name }}</span>
-                  <button class="btn btn-xs btn-ghost" (click)="openConfigDialog()">
-                    <i class="icon">⚙️</i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="toolbar-right">
-              <div class="canvas-info">
-                <span class="canvas-hint">💡 Double-click nodes to configure</span>
-              </div>
-            </div>
+          <div class="form-group">
+            <label for="format">Display Format</label>
+            <select 
+              id="format" 
+              class="form-select" 
+              [(ngModel)]="selectedNode.config.format"
+              (change)="onConfigChange()">
+              <option value="table">Table</option>
+              <option value="json">JSON</option>
+              <option value="raw">Raw</option>
+            </select>
           </div>
 
-          <div class="canvas-wrapper">
-            <div
-              #drawflowContainer
-              id="drawflow"
-              class="canvas"
-              (drop)="onDrop($event)"
-              (dragover)="onDragOver($event)"
-            ></div>
-            
-            <div class="canvas-empty-state" *ngIf="nodeCount === 0">
-              <div class="empty-state-content">
-                <div class="empty-state-icon">🚀</div>
-                <h3>Start Building Your Workflow</h3>
-                <p>Drag components from the sidebar to create your automation</p>
-                <div class="quick-start-buttons">
-                  <button class="btn btn-outline" (click)="addQuickStartNode('http-request')">
-                    <i class="icon">🌐</i>
-                    Add HTTP Request
-                  </button>
-                  <button class="btn btn-outline" (click)="addQuickStartNode('transform')">
-                    <i class="icon">🔄</i>
-                    Add Transform
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-
-      <div class="dialog-overlay" *ngIf="showConfigDialog" (click)="closeConfigDialog()">
-        <div class="dialog-container" (click)="$event.stopPropagation()">
-          <div class="dialog-header">
-            <div class="dialog-header-content">
-              <div class="node-type-indicator" [attr.data-type]="selectedNode?.type">
-                <span class="node-icon">{{ getNodeIcon(selectedNode?.type) }}</span>
-              </div>
-              <div class="dialog-title-section">
-                <h2>{{ getNodeDisplayName(selectedNode?.type) }}</h2>
-                <p>Configure your node settings</p>
-              </div>
-            </div>
-            <button class="dialog-close-btn" (click)="closeConfigDialog()">
-              <i class="icon">✕</i>
-            </button>
-          </div>
-
-          <div class="dialog-body" *ngIf="selectedNode">
-            <div class="config-section">
-              <div class="section-header">
-                <h3>Basic Information</h3>
-              </div>
-              <div class="form-group">
-                <label>Node Name</label>
-                <input
-                  type="text"
-                  [(ngModel)]="selectedNode.name"
-                  (ngModelChange)="onConfigChange()"
-                  class="form-input"
-                  placeholder="Enter node name..."
-                >
-              </div>
-            </div>
-
-            <div class="config-section" *ngIf="selectedNode?.type === 'display-data'">
-              <div class="section-header">
-                <h3>📊 Data Visualization</h3>
-                <span class="section-badge">Output</span>
-              </div>
-
-              <div class="form-group">
-                <label for="format">Display Format</label>
-                <select 
-                  id="format" 
-                  class="form-select" 
-                  [(ngModel)]="selectedNode.config.format"
-                  (change)="onConfigChange()">
-                  <option value="table">Table</option>
-                  <option value="json">JSON</option>
-                  <option value="raw">Raw</option>
-                </select>
-              </div>
-
-              <div class="transform-panel">
-                <div class="panel-header">
-                  <h4>💾 Input Data</h4>
-                  <button class="btn btn-xs btn-ghost" 
-                          (click)="executeWorkflow()"
-                          title="Refresh data">
-                    🔄
-                  </button>
-                </div>
-                <div class="data-viewer">
-                  <div *ngIf="getInputPreview(selectedNode.id); else noInputData">
-                    <pre>{{ getInputPreview(selectedNode.id) | json }}</pre>
-                  </div>
-                  <ng-template #noInputData>
-                    <div class="no-data-message">
-                      <div class="icon">📭</div>
-                      <p>No data available</p>
-                      <small>Run the workflow to see data</small>
-                    </div>
-                  </ng-template>
-                </div>
-              </div>
-
-              <div class="transform-panel" *ngIf="displayDataResults[selectedNode.id]">
-                <div class="panel-header">
-                  <h4>📊 Visualized Data</h4>
-                  <span class="section-badge success">Executed</span>
-                </div>
-                <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format === 'table'">
-                  <div class="table-container" *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length > 0">
-                    <table class="data-table">
-                      <thead>
-                        <tr>
-                          <th *ngFor="let column of getTableColumns(displayDataResults[selectedNode.id].data)">
-                            {{ column }}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let row of getTableRows(displayDataResults[selectedNode.id].data)">
-                          <td *ngFor="let column of getTableColumns(displayDataResults[selectedNode.id].data)">
-                            {{ row[column] }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length === 0" class="no-data-message">
-                    <div class="icon">📊</div>
-                    <p>No data to display in table</p>
-                  </div>
-                </div>
-                <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format !== 'table'">
-                  <pre>{{ displayDataResults[selectedNode.id].data | json }}</pre>
-                </div>
-              </div>
-            </div>
-
-            <div class="config-section" *ngIf="selectedNode.type === 'http-request'">
-              <div class="section-header">
-                <h3>HTTP Request Configuration</h3>
-                <span class="section-badge">Required</span>
-              </div>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label>URL</label>
-                  <input
-                    type="url"
-                    [(ngModel)]="selectedNode.config.url"
-                    (ngModelChange)="onConfigChange()"
-                    placeholder="https://api.example.com/endpoint"
-                    class="form-input"
-                  >
-                </div>
-                <div class="form-group form-group-sm">
-                  <label>Method</label>
-                  <select
-                    [(ngModel)]="selectedNode.config.method"
-                    (ngModelChange)="onConfigChange()"
-                    class="form-select"
-                  >
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Headers</label>
-                <textarea
-                  [(ngModel)]="selectedNode.config.headers"
-                  (ngModelChange)="onConfigChange()"
-                  placeholder='{"Content-Type": "application/json"}'
-                  class="form-textarea code-editor"
-                  rows="3"
-                ></textarea>
-              </div>
-
-              <div class="form-group" *ngIf="selectedNode.config.method === 'POST' || selectedNode.config.method === 'PUT'">
-                <label>Request Body</label>
-                <textarea
-                  [(ngModel)]="selectedNode.config.body"
-                  (ngModelChange)="onConfigChange()"
-                  placeholder='{"key": "value"}'
-                  class="form-textarea code-editor"
-                  rows="4"
-                ></textarea>
-              </div>
-            </div>
-
-            <div class="config-section" *ngIf="selectedNode.type === 'transform'">
-              <div class="section-header">
-                <h3>Data Transformation</h3>
-                <span class="section-badge advanced">Advanced</span>
-              </div>
-
-              <div class="transform-panel">
-                <div class="panel-header">
-                  <h4>📥 Input Data</h4>
-                  <button class="btn btn-xs btn-outline" (click)="previewData[selectedNode.id] = generateSampleData()">
-                    Generate Sample
-                  </button>
-                </div>
-                <div class="data-viewer">
-                  <pre *ngIf="getInputPreview(selectedNode.id) || previewData[selectedNode.id]; else noData">{{ getInputPreview(selectedNode.id) || previewData[selectedNode.id] | json }}</pre>
-                  <ng-template #noData>
-                    <div class="no-data-message">
-                      <i class="icon">📭</i>
-                      <span>Connect an input node to see data</span>
-                    </div>
-                  </ng-template>
-                </div>
-              </div>
-
-              <div class="transform-panel">
-                <div class="panel-header">
-                  <h4>🔧 Field Mappings</h4>
-                  <button class="btn btn-xs btn-primary" (click)="addTransformMapping(selectedNode.id)">
-                    Add Mapping
-                  </button>
-                </div>
-                
-                <div class="mappings-list">
-                  <div 
-                    *ngFor="let mapping of transformMappings[selectedNode.id]; let i = index" 
-                    class="mapping-card"
-                    [class.disabled]="!mapping.enabled">
-                    
-                    <div class="mapping-header">
-                      <input type="checkbox" [(ngModel)]="mapping.enabled" (change)="updateTransformConfig(selectedNode.id)" class="mapping-toggle">
-                      <select [(ngModel)]="mapping.type" (ngModelChange)="updateTransformConfig(selectedNode.id)" class="mapping-type-select">
-                        <option value="direct">📋 Direct Copy</option>
-                        <option value="constant">📌 Constant Value</option>
-                        <option value="computed">⚙️ Computed</option>
-                      </select>
-                      <button class="btn btn-xs btn-ghost mapping-delete" (click)="removeTransformMapping(selectedNode.id, i)">
-                        🗑️
-                      </button>
-                    </div>
-
-                    <div class="mapping-content">
-                      <div class="form-row" *ngIf="mapping.type === 'direct'">
-                        <div class="form-group">
-                          <label>Source Field</label>
-                          <select [(ngModel)]="mapping.sourceField" (ngModelChange)="updateTransformConfig(selectedNode.id)" class="form-select">
-                            <option value="">Select field...</option>
-                            <option *ngFor="let field of extractAvailableFields(getInputPreview(selectedNode.id) || previewData[selectedNode.id])" [value]="field">
-                              {{ field }}
-                            </option>
-                          </select>
-                        </div>
-                        <div class="form-group">
-                          <label>Target Field</label>
-                          <input type="text" [(ngModel)]="mapping.targetField" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="targetFieldName" class="form-input">
-                        </div>
-                      </div>
-
-                      <div class="form-group" *ngIf="mapping.type !== 'direct'">
-                        <label>Target Field</label>
-                        <input type="text" [(ngModel)]="mapping.targetField" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="targetFieldName" class="form-input">
-                      </div>
-
-                      <div class="form-group" *ngIf="mapping.type === 'constant'">
-                        <label>Constant Value</label>
-                        <input type="text" [(ngModel)]="mapping.value" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="Fixed value" class="form-input">
-                      </div>
-
-                      <div class="form-group" *ngIf="mapping.type === 'computed'">
-                        <label>Expression</label>
-                        <textarea [(ngModel)]="mapping.value" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="data.field1 + ' - ' + data.field2" class="form-textarea code-editor" rows="2"></textarea>
-                      </div>
-
-                      <div class="mapping-preview" *ngIf="mapping.enabled && mapping.targetField">
-                        <label>Preview:</label>
-                        <code>{{ getNestedValue(getInputPreview(selectedNode.id) || previewData[selectedNode.id], mapping.sourceField) | json }}</code>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div *ngIf="!transformMappings[selectedNode.id] || transformMappings[selectedNode.id].length === 0" class="empty-mappings">
-                    <i class="icon">📝</i>
-                    <span>No mappings configured. Add your first mapping above.</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="transform-panel">
-                <div class="panel-header">
-                  <h4>📤 Output Preview</h4>
-                </div>
-                <div class="data-viewer">
-                  <pre *ngIf="generateTransformPreview(selectedNode.id); else noOutput">{{ generateTransformPreview(selectedNode.id) | json }}</pre>
-                  <ng-template #noOutput>
-                    <div class="no-data-message">
-                      <i class="icon">⚙️</i>
-                      <span>Configure mappings to see output</span>
-                    </div>
-                  </ng-template>
-                </div>
-              </div>
-            </div>
-
-            <div class="config-section" *ngIf="selectedNode?.type === 'filter'">
-              <div class="section-header">
-                <h3>Data Filter</h3>
-                <span class="section-badge">Filter</span>
-              </div>
-              
-              
-              
-            </div>
-
-            <div class="config-section" *ngIf="executionResults[selectedNode.id]">
-              <div class="section-header">
-                <h3>Execution Results</h3>
-                <span class="section-badge success">Success</span>
-              </div>
-              <div class="execution-result-viewer">
-                <pre>{{ executionResults[selectedNode.id] | json }}</pre>
-              </div>
-            </div>
-          </div>
-
-          <div class="dialog-footer">
-            <div class="footer-left">
-              <button class="btn btn-danger" (click)="deleteSelectedNode()">
-                <i class="icon">🗑️</i>
-                Delete Node
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>💾 Input Data</h4>
+              <button class="btn btn-xs btn-ghost" 
+                      (click)="executeWorkflow()"
+                      title="Refresh data">
+                🔄
               </button>
             </div>
-            <div class="footer-right">
-              <button class="btn btn-secondary" (click)="closeConfigDialog()">Cancel</button>
-              <button class="btn btn-primary" (click)="closeConfigDialog()">Save Changes</button>
+            <div class="data-viewer">
+              <div *ngIf="getInputPreview(selectedNode.id); else noInputData">
+                <pre>{{ getInputPreview(selectedNode.id) | json }}</pre>
+              </div>
+              <ng-template #noInputData>
+                <div class="no-data-message">
+                  <div class="icon">📭</div>
+                  <p>No data available</p>
+                  <small>Run the workflow to see data</small>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="transform-panel" *ngIf="displayDataResults[selectedNode.id]">
+            <div class="panel-header">
+              <h4>📊 Visualized Data</h4>
+              <span class="section-badge success">Executed</span>
+            </div>
+            <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format === 'table'">
+              <div class="table-container" *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length > 0">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th *ngFor="let column of getTableColumns(displayDataResults[selectedNode.id].data)">
+                        {{ column }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of getTableRows(displayDataResults[selectedNode.id].data)">
+                      <td *ngFor="let column of getTableColumns(displayDataResults[selectedNode.id].data)">
+                        {{ row[column] }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div *ngIf="getTableColumns(displayDataResults[selectedNode.id].data).length === 0" class="no-data-message">
+                <div class="icon">📊</div>
+                <p>No data to display in table</p>
+              </div>
+            </div>
+            <div class="data-viewer" *ngIf="displayDataResults[selectedNode.id].format !== 'table'">
+              <pre>{{ displayDataResults[selectedNode.id].data | json }}</pre>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="dialog-overlay" *ngIf="showLoadDialog" (click)="closeLoadDialog()">
-      <div class="dialog-container" style="max-width: 600px" (click)="$event.stopPropagation()">
-        <div class="dialog-header">
-          <div class="dialog-header-content">
-            <div class="node-type-indicator" style="background: #dcfce7; border-color: #86efac;">
-              <span class="node-icon">📂</span>
+        <div class="config-section" *ngIf="selectedNode.type === 'http-request'">
+          <div class="section-header">
+            <h3>HTTP Request Configuration</h3>
+            <span class="section-badge">Required</span>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>URL</label>
+              <input
+                type="url"
+                [(ngModel)]="selectedNode.config.url"
+                (ngModelChange)="onConfigChange()"
+                placeholder="https://api.example.com/endpoint"
+                class="form-input"
+              >
             </div>
-            <div class="dialog-title-section">
-              <h2>Load Workflow</h2>
-              <p>Select a saved workflow to load</p>
+            <div class="form-group form-group-sm">
+              <label>Method</label>
+              <select
+                [(ngModel)]="selectedNode.config.method"
+                (ngModelChange)="onConfigChange()"
+                class="form-select"
+              >
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+              </select>
             </div>
           </div>
-          <button class="dialog-close-btn" (click)="closeLoadDialog()">
-            ✕
-          </button>
+
+          <div class="form-group">
+            <label>Headers</label>
+            <textarea
+              [(ngModel)]="selectedNode.config.headers"
+              (ngModelChange)="onConfigChange()"
+              placeholder='{"Content-Type": "application/json"}'
+              class="form-textarea code-editor"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group" *ngIf="selectedNode.config.method === 'POST' || selectedNode.config.method === 'PUT'">
+            <label>Request Body</label>
+            <textarea
+              [(ngModel)]="selectedNode.config.body"
+              (ngModelChange)="onConfigChange()"
+              placeholder='{"key": "value"}'
+              class="form-textarea code-editor"
+              rows="4"
+            ></textarea>
+          </div>
         </div>
 
-        <div class="dialog-body">
-          <div *ngIf="savedWorkflows.length === 0" class="no-data-message">
-            <div class="icon">📭</div>
-            <h3>No saved workflows</h3>
-            <p>Create and save a workflow first to load it here.</p>
+        <div class="config-section" *ngIf="selectedNode.type === 'transform'">
+          <div class="section-header">
+            <h3>Data Transformation</h3>
+            <span class="section-badge advanced">Advanced</span>
           </div>
 
-          <div *ngIf="savedWorkflows.length > 0" class="workflows-list">
-            <div class="workflow-card" 
-                 *ngFor="let workflow of savedWorkflows"
-                 (click)="loadWorkflow(workflow)">
-              <div class="workflow-info">
-                <div class="workflow-header">
-                  <h3>{{ workflow.name || 'Unnamed Workflow' }}</h3>
-                  <div class="workflow-actions">
-                    <button class="btn btn-xs btn-danger" 
-                            (click)="$event.stopPropagation(); deleteWorkflow(workflow.id)"
-                            title="Delete workflow">
-                      🗑️
-                    </button>
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>📥 Input Data</h4>
+              <button class="btn btn-xs btn-outline" (click)="previewData[selectedNode.id] = generateSampleData()">
+                Generate Sample
+              </button>
+            </div>
+            <div class="data-viewer">
+              <pre *ngIf="getInputPreview(selectedNode.id) || previewData[selectedNode.id]; else noData">{{ getInputPreview(selectedNode.id) || previewData[selectedNode.id] | json }}</pre>
+              <ng-template #noData>
+                <div class="no-data-message">
+                  <i class="icon">📭</i>
+                  <span>Connect an input node to see data</span>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>🔧 Field Mappings</h4>
+              <button class="btn btn-xs btn-primary" (click)="addTransformMapping(selectedNode.id)">
+                Add Mapping
+              </button>
+            </div>
+            
+            <div class="mappings-list">
+              <div 
+                *ngFor="let mapping of transformMappings[selectedNode.id]; let i = index" 
+                class="mapping-card"
+                [class.disabled]="!mapping.enabled">
+                
+                <div class="mapping-header">
+                  <input type="checkbox" [(ngModel)]="mapping.enabled" (change)="updateTransformConfig(selectedNode.id)" class="mapping-toggle">
+                  <select [(ngModel)]="mapping.type" (ngModelChange)="updateTransformConfig(selectedNode.id)" class="mapping-type-select">
+                    <option value="direct">📋 Direct Copy</option>
+                    <option value="constant">📌 Constant Value</option>
+                    <option value="computed">⚙️ Computed</option>
+                  </select>
+                  <button class="btn btn-xs btn-ghost mapping-delete" (click)="removeTransformMapping(selectedNode.id, i)">
+                    🗑️
+                  </button>
+                </div>
+
+                <div class="mapping-content">
+                  <div class="form-row" *ngIf="mapping.type === 'direct'">
+                    <div class="form-group">
+                      <label>Source Field</label>
+                      <select [(ngModel)]="mapping.sourceField" (ngModelChange)="updateTransformConfig(selectedNode.id)" class="form-select">
+                        <option value="">Select field...</option>
+                        <option *ngFor="let field of extractAvailableFields(getInputPreview(selectedNode.id) || previewData[selectedNode.id])" [value]="field">
+                          {{ field }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Target Field</label>
+                      <input type="text" [(ngModel)]="mapping.targetField" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="targetFieldName" class="form-input">
+                    </div>
+                  </div>
+
+                  <div class="form-group" *ngIf="mapping.type !== 'direct'">
+                    <label>Target Field</label>
+                    <input type="text" [(ngModel)]="mapping.targetField" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="targetFieldName" class="form-input">
+                  </div>
+
+                  <div class="form-group" *ngIf="mapping.type === 'constant'">
+                    <label>Constant Value</label>
+                    <input type="text" [(ngModel)]="mapping.value" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="Fixed value" class="form-input">
+                  </div>
+
+                  <div class="form-group" *ngIf="mapping.type === 'computed'">
+                    <label>Expression</label>
+                    <textarea [(ngModel)]="mapping.value" (ngModelChange)="updateTransformConfig(selectedNode.id)" placeholder="data.field1 + ' - ' + data.field2" class="form-textarea code-editor" rows="2"></textarea>
+                  </div>
+
+                  <div class="mapping-preview" *ngIf="mapping.enabled && mapping.targetField">
+                    <label>Preview:</label>
+                    <code>{{ getNestedValue(getInputPreview(selectedNode.id) || previewData[selectedNode.id], mapping.sourceField) | json }}</code>
                   </div>
                 </div>
-                <div class="workflow-meta">
-                  <span class="created-date">
-                    📅 {{ workflow.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                  </span>
-                  <span class="node-count" *ngIf="workflow.data?.drawflow?.Home?.data">
-                    📦 {{ (workflow.data.drawflow.Home.data | keyvalue).length }} nodes
+              </div>
+
+              <div *ngIf="!transformMappings[selectedNode.id] || transformMappings[selectedNode.id].length === 0" class="empty-mappings">
+                <i class="icon">📝</i>
+                <span>No mappings configured. Add your first mapping above.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>📤 Output Preview</h4>
+            </div>
+            <div class="data-viewer">
+              <pre *ngIf="generateTransformPreview(selectedNode.id); else noOutput">{{ generateTransformPreview(selectedNode.id) | json }}</pre>
+              <ng-template #noOutput>
+                <div class="no-data-message">
+                  <i class="icon">⚙️</i>
+                  <span>Configure mappings to see output</span>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section" *ngIf="selectedNode?.type === 'if-condition'">
+          <div class="section-header">
+            <h3>🔀 If Condition</h3>
+            <span class="section-badge">Logic</span>
+          </div>
+
+          <div class="form-group">
+            <label>Condition Expression</label>
+            <textarea
+              [(ngModel)]="selectedNode.config.condition"
+              (ngModelChange)="onConfigChange()"
+              placeholder="data.age > 18"
+              class="form-textarea code-editor"
+              rows="3"
+            ></textarea>
+            <div class="form-help">
+              <h4>Available condition patterns:</h4>
+              <ul>
+                <li><code>data.fieldName > 5</code> - Compare field value</li>
+                <li><code>data.status === "active"</code> - Exact match</li>
+                <li><code>data.age >= 18</code> - Greater than or equal</li>
+                <li><code>data.name !== ""</code> - Not equal</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>📥 Input Data</h4>
+              <button class="btn btn-xs btn-ghost" 
+                      (click)="executeWorkflow()"
+                      title="Refresh data">
+                🔄
+              </button>
+            </div>
+            <div class="data-viewer">
+              <div *ngIf="getInputPreview(selectedNode.id); else noInputData">
+                <pre>{{ getInputPreview(selectedNode.id) | json }}</pre>
+              </div>
+              <ng-template #noInputData>
+                <div class="no-data-message">
+                  <div class="icon">📭</div>
+                  <p>No data available</p>
+                  <small>Connect input to see data for condition</small>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="condition-outputs" *ngIf="selectedNode.config.condition">
+            <div class="panel-header">
+              <h4>⚡ Execution Paths</h4>
+            </div>
+            <div class="output-paths">
+              <div class="output-path true-path">
+                <div class="path-header">
+                  <span class="path-icon">✅</span>
+                  <span class="path-label">True Path (Output 1)</span>
+                </div>
+                <p>Executed when condition evaluates to <strong>true</strong></p>
+              </div>
+              <div class="output-path false-path">
+                <div class="path-header">
+                  <span class="path-icon">❌</span>
+                  <span class="path-label">False Path (Output 2)</span>
+                </div>
+                <p>Executed when condition evaluates to <strong>false</strong></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="transform-panel" *ngIf="executionResults[selectedNode.id]">
+            <div class="panel-header">
+              <h4>🎯 Condition Result</h4>
+              <span class="section-badge" 
+                    [class.success]="executionResults[selectedNode.id].result" 
+                    [class.error]="!executionResults[selectedNode.id].result">
+                {{ executionResults[selectedNode.id].result ? 'TRUE' : 'FALSE' }}
+              </span>
+            </div>
+            <div class="data-viewer">
+              <div class="condition-result">
+                <div class="result-item">
+                  <label>Condition:</label>
+                  <code>{{ executionResults[selectedNode.id].conditionEvaluated }}</code>
+                </div>
+                <div class="result-item">
+                  <label>Result:</label>
+                  <span class="result-value" 
+                        [class.true]="executionResults[selectedNode.id].result"
+                        [class.false]="!executionResults[selectedNode.id].result">
+                    {{ executionResults[selectedNode.id].result ? 'TRUE' : 'FALSE' }}
                   </span>
                 </div>
-              </div>
-              <div class="workflow-preview">
-                <span class="preview-icon">🚀</span>
+                <div class="result-item">
+                  <label>Path Taken:</label>
+                  <span class="path-taken">{{ executionResults[selectedNode.id].executionPath === 'true' ? 'True Path (Output 1)' : 'False Path (Output 2)' }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="dialog-footer">
-          <div class="footer-left">
-            <span class="status-text">{{ savedWorkflows.length }} workflow(s) available</span>
+        <div class="config-section" *ngIf="selectedNode?.type === 'delay'">
+          <div class="section-header">
+            <h3>⏱️ Delay Execution</h3>
+            <span class="section-badge">Timer</span>
           </div>
-          <div class="footer-right">
-            <button class="btn btn-outline" (click)="closeLoadDialog()">
-              Cancel
-            </button>
+
+          <div class="form-group">
+            <label>Delay Duration (milliseconds)</label>
+            <input
+              type="number"
+              [(ngModel)]="selectedNode.config.delay"
+              (ngModelChange)="onConfigChange()"
+              placeholder="1000"
+              min="0"
+              max="60000"
+              class="form-input"
+            >
+            <div class="form-help">
+              <p>Duration to wait before passing data to the next node.</p>
+              <ul>
+                <li>1000 ms = 1 second</li>
+                <li>5000 ms = 5 seconds</li>
+                <li>Maximum: 60 seconds (60000 ms)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="transform-panel">
+            <div class="panel-header">
+              <h4>📥 Input Data</h4>
+              <span class="section-badge info">Pass-through</span>
+            </div>
+            <div class="data-viewer">
+              <div *ngIf="getInputPreview(selectedNode.id); else noInputData">
+                <pre>{{ getInputPreview(selectedNode.id) | json }}</pre>
+              </div>
+              <ng-template #noInputData>
+                <div class="no-data-message">
+                  <div class="icon">📭</div>
+                  <p>No data available</p>
+                  <small>Connect input to see data that will be passed through</small>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="delay-info">
+            <div class="info-card">
+              <div class="info-header">
+                <span class="info-icon">ℹ️</span>
+                <span class="info-title">How Delay Works</span>
+              </div>
+              <div class="info-content">
+                <p>The delay node pauses workflow execution for the specified duration, then passes the input data unchanged to the next node.</p>
+                <p><strong>Use cases:</strong> Rate limiting, scheduled delays, waiting for external processes.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="transform-panel" *ngIf="executionResults[selectedNode.id]">
+            <div class="panel-header">
+              <h4>⏱️ Execution Result</h4>
+              <span class="section-badge success">Completed</span>
+            </div>
+            <div class="data-viewer">
+              <div class="delay-result">
+                <div class="result-item">
+                  <label>Delay Duration:</label>
+                  <span class="delay-duration">{{ executionResults[selectedNode.id].delayExecuted }}ms</span>
+                </div>
+                <div class="result-item">
+                  <label>Executed At:</label>
+                  <span class="execution-time">{{ executionResults[selectedNode.id].executedAt | date:'HH:mm:ss' }}</span>
+                </div>
+                <div class="result-item">
+                  <label>Output Data:</label>
+                  <pre class="output-data">{{ executionResults[selectedNode.id].data | json }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-section" *ngIf="selectedNode?.type === 'filter'">
+          <div class="section-header">
+            <h3>Data Filter</h3>
+            <span class="section-badge">Filter</span>
+          </div>
+          
+          
+          
+        </div>
+
+        <div class="config-section" *ngIf="executionResults[selectedNode.id]">
+          <div class="section-header">
+            <h3>Execution Results</h3>
+            <span class="section-badge success">Success</span>
+          </div>
+          <div class="execution-result-viewer">
+            <pre>{{ executionResults[selectedNode.id] | json }}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <div class="footer-left">
+          <button class="btn btn-danger" (click)="deleteSelectedNode()">
+            <i class="icon">🗑️</i>
+            Delete Node
+          </button>
+        </div>
+        <div class="footer-right">
+          <button class="btn btn-secondary" (click)="closeConfigDialog()">Cancel</button>
+          <button class="btn btn-primary" (click)="closeConfigDialog()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-overlay" *ngIf="showLoadDialog" (click)="closeLoadDialog()">
+  <div class="dialog-container" style="max-width: 600px" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <div class="dialog-header-content">
+        <div class="node-type-indicator" style="background: #dcfce7; border-color: #86efac;">
+          <span class="node-icon">📂</span>
+        </div>
+        <div class="dialog-title-section">
+          <h2>Load Workflow</h2>
+          <p>Select a saved workflow to load</p>
+        </div>
+      </div>
+      <button class="dialog-close-btn" (click)="closeLoadDialog()">
+        ✕
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div *ngIf="savedWorkflows.length === 0" class="no-data-message">
+        <div class="icon">📭</div>
+        <h3>No saved workflows</h3>
+        <p>Create and save a workflow first to load it here.</p>
+      </div>
+
+      <div *ngIf="savedWorkflows.length > 0" class="workflows-list">
+        <div class="workflow-card" 
+             *ngFor="let workflow of savedWorkflows"
+             (click)="loadWorkflow(workflow)">
+          <div class="workflow-info">
+            <div class="workflow-header">
+              <h3>{{ workflow.name || 'Unnamed Workflow' }}</h3>
+              <div class="workflow-actions">
+                <button class="btn btn-xs btn-danger" 
+                        (click)="$event.stopPropagation(); deleteWorkflow(workflow.id)"
+                        title="Delete workflow">
+                  🗑️
+                </button>
+              </div>
+            </div>
+            <div class="workflow-meta">
+              <span class="created-date">
+                📅 {{ workflow.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="node-count" *ngIf="workflow.data?.drawflow?.Home?.data">
+                📦 {{ (workflow.data.drawflow.Home.data | keyvalue).length }} nodes
+              </span>
+            </div>
+          </div>
+          <div class="workflow-preview">
+            <span class="preview-icon">🚀</span>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="dialog-footer">
+      <div class="footer-left">
+        <span class="status-text">{{ savedWorkflows.length }} workflow(s) available</span>
+      </div>
+      <div class="footer-right">
+        <button class="btn btn-outline" (click)="closeLoadDialog()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

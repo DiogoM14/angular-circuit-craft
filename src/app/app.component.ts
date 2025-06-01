@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { ExecutionResult } from './types';
+import { HeaderComponent } from './components/header/header.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { CanvasComponent } from './components/canvas/canvas.component';
 
 declare var Drawflow: any;
 
@@ -28,7 +31,7 @@ interface SimpleConnectorTemplate {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HeaderComponent, SidebarComponent, CanvasComponent],
   templateUrl: './app.component.html',
   styleUrl: "./app.component.scss"
 })
@@ -214,10 +217,18 @@ export class AppComponent implements OnInit {
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
+    event.stopPropagation();
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
+    event.stopPropagation();
+    
+    if ((event as any)._processed) {
+      return;
+    }
+    (event as any)._processed = true;
+    
     if (event.dataTransfer && this.editor) {
       const connectorData = JSON.parse(event.dataTransfer.getData('text/plain'));
       this.createNode(connectorData, event.offsetX, event.offsetY);
@@ -490,15 +501,31 @@ export class AppComponent implements OnInit {
 
     try {
       const sortedNodes = this.topologicalSort(workflowData.nodes, workflowData.connections);
+      const executedNodes = new Set<string>();
+      const skippedNodes = new Set<string>();
 
       for (const node of sortedNodes) {
         try {
+          // Check if this node should be executed based on conditional logic
+          if (this.shouldSkipNode(node, workflowData.connections, executionResult.results, skippedNodes)) {
+            console.log(`Skipping node: ${node.name} (${node.type}) - conditional path not taken`);
+            skippedNodes.add(node.id);
+            continue;
+          }
+
           console.log(`Executing node: ${node.name} (${node.type})`);
 
           this.setNodeExecuting(node.id);
 
           const result = await this.executeNode(node, executionResult.results, workflowData.connections);
           executionResult.results[node.id] = result;
+          executedNodes.add(node.id);
+
+          // Handle if-condition node results for flow control
+          if (node.type === 'if-condition' && result) {
+            this.handleConditionalBranching(node, result, workflowData.connections, skippedNodes);
+          }
+
           console.log(`Node ${node.name} executed successfully:`, result);
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
@@ -524,6 +551,92 @@ export class AppComponent implements OnInit {
     return executionResult;
   }
 
+  private shouldSkipNode(
+    node: any, 
+    connections: any[], 
+    results: { [nodeId: string]: any }, 
+    skippedNodes: Set<string>
+  ): boolean {
+    // Check if any input connections come from if-condition nodes
+    const inputConnections = connections.filter(conn => conn.targetNode === node.id);
+    
+    for (const connection of inputConnections) {
+      const sourceNodeResult = results[connection.sourceNode];
+      
+      // If the source node is an if-condition
+      if (sourceNodeResult && sourceNodeResult.executionPath !== undefined) {
+        // Check if this connection should be active based on the condition result
+        const shouldTakeThisPath = this.shouldTakeConditionalPath(
+          connection, 
+          sourceNodeResult.result
+        );
+        
+        if (!shouldTakeThisPath) {
+          return true; // Skip this node
+        }
+      }
+      
+      // If the source node was skipped, skip this node too
+      if (skippedNodes.has(connection.sourceNode)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  private shouldTakeConditionalPath(connection: any, conditionResult: boolean): boolean {
+    // For if-condition nodes:
+    // Output 0 (first output) = true path
+    // Output 1 (second output) = false path
+    const outputIndex = parseInt(connection.sourceOutput) || 0;
+    
+    if (outputIndex === 0) {
+      return conditionResult === true; // True path
+    } else if (outputIndex === 1) {
+      return conditionResult === false; // False path
+    }
+    
+    return true; // Default to executing if unclear
+  }
+
+  private handleConditionalBranching(
+    ifNode: any, 
+    result: any, 
+    connections: any[], 
+    skippedNodes: Set<string>
+  ): void {
+    // Find all output connections from this if-condition node
+    const outputConnections = connections.filter(conn => conn.sourceNode === ifNode.id);
+    
+    outputConnections.forEach(connection => {
+      const shouldTakePath = this.shouldTakeConditionalPath(connection, result.result);
+      
+      if (!shouldTakePath) {
+        // Mark downstream nodes of this path as skipped
+        this.markDownstreamNodesAsSkipped(connection.targetNode, connections, skippedNodes);
+      }
+    });
+  }
+
+  private markDownstreamNodesAsSkipped(
+    nodeId: string, 
+    connections: any[], 
+    skippedNodes: Set<string>
+  ): void {
+    if (skippedNodes.has(nodeId)) {
+      return; // Already processed
+    }
+    
+    skippedNodes.add(nodeId);
+    
+    // Find downstream connections and mark those nodes as skipped too
+    const downstreamConnections = connections.filter(conn => conn.sourceNode === nodeId);
+    downstreamConnections.forEach(connection => {
+      this.markDownstreamNodesAsSkipped(connection.targetNode, connections, skippedNodes);
+    });
+  }
+
   private async executeNode(node: any, previousResults: { [nodeId: string]: any }, connections: any[]): Promise<any> {
     switch (node.type) {
       case 'http-request':
@@ -546,6 +659,14 @@ export class AppComponent implements OnInit {
       case 'transform':
         const transformInput = this.getInputData(node, previousResults, connections);
         return this.executeTransform(transformInput, node.data);
+
+      case 'if-condition':
+        const conditionInput = this.getInputData(node, previousResults, connections);
+        return this.executeIfCondition(conditionInput, node.data);
+
+      case 'delay':
+        const delayInput = this.getInputData(node, previousResults, connections);
+        return await this.executeDelay(delayInput, node.data);
 
       default:
         return { message: `Node type ${node.type} executed`, data: node.data };
@@ -656,6 +777,147 @@ export class AppComponent implements OnInit {
       return { ...data, transformed: true, mapping: mappingObj };
     } catch (error) {
       throw new Error(`Transform error: ${error}`);
+    }
+  }
+
+  private executeIfCondition(data: any, config: any): any {
+    try {
+      console.log('Executing if-condition with data:', data, 'and condition:', config.condition);
+      
+      if (!config.condition || config.condition.trim() === '') {
+        // Default to true if no condition is set
+        return {
+          result: true,
+          data: data,
+          conditionEvaluated: 'true (no condition set)',
+          executionPath: 'true'
+        };
+      }
+
+      // Evaluate the condition
+      const conditionResult = this.evaluateCondition(data, config.condition);
+      
+      return {
+        result: conditionResult,
+        data: data,
+        conditionEvaluated: config.condition,
+        executionPath: conditionResult ? 'true' : 'false'
+      };
+    } catch (error) {
+      throw new Error(`If-condition error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private async executeDelay(data: any, config: any): Promise<any> {
+    try {
+      const delayMs = parseInt(config.delay) || 1000; // Default to 1 second
+      console.log(`Executing delay for ${delayMs}ms with data:`, data);
+      
+      // Create a promise that resolves after the specified delay
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      
+      return {
+        data: data,
+        delayExecuted: delayMs,
+        executedAt: new Date().toISOString(),
+        message: `Delayed execution by ${delayMs}ms`
+      };
+    } catch (error) {
+      throw new Error(`Delay error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private evaluateCondition(data: any, condition: string): boolean {
+    try {
+      // Simple condition evaluation
+      // Replace common patterns to make conditions more user-friendly
+      let processedCondition = condition;
+      
+      // Handle common comparison patterns
+      if (data !== null && typeof data === 'object') {
+        // Replace data.field references
+        processedCondition = processedCondition.replace(/data\.(\w+)/g, (match, field) => {
+          const value = this.getNestedValue(data, field);
+          return typeof value === 'string' ? `"${value}"` : String(value);
+        });
+      }
+      
+      // Replace 'data' with the actual data value if it's a simple comparison
+      if (processedCondition.includes('data') && !processedCondition.includes('data.')) {
+        const dataValue = typeof data === 'string' ? `"${data}"` : String(data);
+        processedCondition = processedCondition.replace(/\bdata\b/g, dataValue);
+      }
+      
+      // Evaluate the condition safely
+      // Note: In a production environment, you might want to use a safer expression evaluator
+      console.log('Evaluating condition:', processedCondition);
+      
+      // Simple evaluation for common cases
+      if (processedCondition.includes('===') || processedCondition.includes('==')) {
+        return this.evaluateSimpleComparison(processedCondition);
+      }
+      
+      if (processedCondition.includes('>') || processedCondition.includes('<')) {
+        return this.evaluateNumericComparison(processedCondition);
+      }
+      
+      // For boolean values or simple expressions
+      if (processedCondition === 'true' || processedCondition === 'false') {
+        return processedCondition === 'true';
+      }
+      
+      // Default evaluation using Function constructor (safer than eval)
+      const result = new Function('return ' + processedCondition)();
+      return Boolean(result);
+      
+    } catch (error) {
+      console.warn('Condition evaluation error:', error, 'defaulting to false');
+      return false;
+    }
+  }
+  
+  private evaluateSimpleComparison(condition: string): boolean {
+    try {
+      // Handle === and == comparisons
+      const eqMatch = condition.match(/(.+?)\s*(===|==)\s*(.+)/);
+      if (eqMatch) {
+        const left = eqMatch[1].trim().replace(/"/g, '');
+        const operator = eqMatch[2];
+        const right = eqMatch[3].trim().replace(/"/g, '');
+        
+        if (operator === '===') {
+          return left === right;
+        } else {
+          return left == right;
+        }
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  private evaluateNumericComparison(condition: string): boolean {
+    try {
+      // Handle > < >= <= comparisons
+      const numMatch = condition.match(/(.+?)\s*(>=|<=|>|<)\s*(.+)/);
+      if (numMatch) {
+        const left = parseFloat(numMatch[1].trim());
+        const operator = numMatch[2];
+        const right = parseFloat(numMatch[3].trim());
+        
+        if (isNaN(left) || isNaN(right)) return false;
+        
+        switch (operator) {
+          case '>': return left > right;
+          case '<': return left < right;
+          case '>=': return left >= right;
+          case '<=': return left <= right;
+        }
+      }
+      return false;
+    } catch (error) {
+      return false;
     }
   }
 
