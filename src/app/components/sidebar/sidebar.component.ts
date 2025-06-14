@@ -1,22 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface SimpleConnectorTemplate {
-  id: string;
-  name: string;
-  category: string;
-  icon: string;
-  description: string;  
-  inputs: number;
-  outputs: number;
-  configSchema: any;
-}
-
-interface Category {
-  name: string;
-  expanded: boolean;
-}
+import { SimpleConnectorTemplate } from '../../types';
+import { Category } from './types/category.type';
 
 @Component({
   selector: 'app-sidebar',

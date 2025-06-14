@@ -1,14 +1,6 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface NodeData {
-  id: string;
-  name: string;
-  type: string;
-  inputs: number;
-  outputs: number;
-  config: any;
-}
+import { NodeData } from '../../types';
 
 @Component({
   selector: 'app-canvas',

@@ -1,32 +1,13 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
-import { ExecutionResult } from './types';
+import { ExecutionResult, NodeData } from './types';
+import { SimpleConnectorTemplate } from './types';
 import { HeaderComponent } from './components/header/header.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 
 declare var Drawflow: any;
-
-interface NodeData {
-  id: string;
-  name: string;
-  type: string;
-  inputs: number;
-  outputs: number;
-  config: any;
-}
-
-interface SimpleConnectorTemplate {
-  id: string;
-  name: string;
-  category: string;
-  icon: string;
-  description: string;  
-  inputs: number;
-  outputs: number;
-  configSchema: any;
-}
 
 @Component({
   selector: 'app-root',
