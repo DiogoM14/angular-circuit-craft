@@ -1,24 +1,4 @@
 <main class="canvas-container">
-  <div class="canvas-toolbar">
-    <div class="toolbar-left">
-      <div class="node-selection-info" *ngIf="selectedNode">
-        <div class="selected-node-badge">
-          <span class="node-icon">{{ getNodeIcon(selectedNode.type) }}</span>
-          <span class="node-name">{{ selectedNode.name }}</span>
-          <button class="btn btn-xs btn-ghost" (click)="onOpenConfigDialog()">
-            <i class="icon">⚙️</i>
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="toolbar-right">
-      <div class="canvas-info">
-        <span class="canvas-hint">💡 Double-click nodes to configure</span>
-      </div>
-    </div>
-  </div>
-
   <div class="canvas-wrapper">
     <div
       #drawflowContainer

@@ -1,0 +1,53 @@
+<div class="bottom-toolbar">
+  <div class="toolbar-left">
+    <div class="execution-controls">
+      <button class="btn btn-execute" (click)="onExecuteWorkflow()" title="Run Workflow">
+        <span class="icon">▶️</span>
+        <span class="label">Test workflow</span>
+      </button>
+      <button class="btn btn-history" (click)="onOpenHistory()" title="Workflow History">
+        <span class="icon">📋</span>
+        <span class="label">History</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar-center">
+    <div class="workflow-stats">
+      <span class="stat-item">
+        <span class="stat-icon">🔗</span>
+        <span class="stat-value">{{ nodeCount }}</span>
+        <span class="stat-label">nodes</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="toolbar-right">
+    <div class="action-controls">
+      <button class="btn btn-icon btn-danger" (click)="onClearWorkflow()" title="Clear Workflow">
+        <span>🗑️</span>
+      </button>
+    </div>
+
+    <div class="zoom-controls">
+      <button class="btn btn-icon" (click)="onZoomOut()" title="Zoom Out">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 2a8 8 0 105.293 14.293l5.414 5.414a1 1 0 001.414-1.414l-5.414-5.414A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/>
+          <path d="M7 9h6v2H7z"/>
+        </svg>
+      </button>
+      <span class="zoom-display">{{ currentZoom }}%</span>
+      <button class="btn btn-icon" (click)="onZoomIn()" title="Zoom In">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 2a8 8 0 105.293 14.293l5.414 5.414a1 1 0 001.414-1.414l-5.414-5.414A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/>
+          <path d="M9 7v2H7v2h2v2h2v-2h2V9h-2V7z"/>
+        </svg>
+      </button>
+      <button class="btn btn-icon" (click)="onResetZoom()" title="Fit to Screen">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 4h4v2H6v2H4V4zm10 0h4v4h-2V6h-2V4zM4 14h2v2h2v2H4v-4zm14 0h2v4h-4v-2h2v-2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div> 

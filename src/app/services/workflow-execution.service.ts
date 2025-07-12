@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { ExecutionResult } from '../types';
 import { NodeExecutionService } from './node-execution.service';
+import { DrawflowService } from './drawflow.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkflowExecutionService {
 
-  constructor(private nodeExecutionService: NodeExecutionService) {}
+  constructor(
+    private nodeExecutionService: NodeExecutionService,
+    private drawflowService: DrawflowService
+  ) {}
 
   async executeWorkflow(drawflowData: any): Promise<ExecutionResult> {
     const executionResult: ExecutionResult = {
@@ -35,7 +39,14 @@ export class WorkflowExecutionService {
 
           console.log(`Executing node: ${node.name} (${node.type})`);
 
+          // Marcar nó como executando
+          this.drawflowService.setNodeExecuting(node.id);
+
           const result = await this.nodeExecutionService.executeNode(node, executionResult.results, workflowData.connections);
+          
+          // Marcar nó como sucesso
+          this.drawflowService.setNodeSuccess(node.id);
+          
           executionResult.results[node.id] = result;
           executedNodes.add(node.id);
 
@@ -46,10 +57,24 @@ export class WorkflowExecutionService {
           console.log(`Node ${node.name} executed successfully:`, result);
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          
+          // Marcar nó como erro imediatamente
+          this.drawflowService.setNodeError(node.id, errorMsg);
+          
+          // Registrar erro nos resultados
           executionResult.errors[node.id] = errorMsg;
           executionResult.results[node.id + '_error'] = errorMsg;
+          
           console.error(`Error in node ${node.name}:`, errorMsg);
           executionResult.status = 'failed';
+          
+          // Não parar a execução se for um nó opcional ou de display
+          if (this.isOptionalNode(node.type)) {
+            console.log(`Continuing execution despite error in optional node: ${node.name}`);
+            continue;
+          }
+          
+          // Para nós críticos, parar a execução
           break;
         }
       }
@@ -62,6 +87,7 @@ export class WorkflowExecutionService {
       executionResult.status = 'failed';
       const errorMsg = error instanceof Error ? error.message : 'Workflow execution error';
       executionResult.errors['workflow'] = errorMsg;
+      console.error('Workflow execution failed:', errorMsg);
     }
 
     executionResult.endTime = new Date();
@@ -206,5 +232,11 @@ export class WorkflowExecutionService {
     nodes.forEach(node => visit(node.id));
 
     return result;
+  }
+
+  private isOptionalNode(nodeType: string): boolean {
+    // Nós que não devem parar a execução em caso de erro
+    const optionalNodeTypes = ['display-data', 'email'];
+    return optionalNodeTypes.includes(nodeType);
   }
 } 

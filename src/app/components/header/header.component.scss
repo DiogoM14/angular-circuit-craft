@@ -1,185 +1,173 @@
+/* =================================
+   MODERN HEADER DESIGN
+   ================================= */
 .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
   padding: 0 24px;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  backdrop-filter: blur(12px);
-  position: relative;
-  z-index: 50;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
   flex: 1;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  font-size: 28px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.logo-text h1 {
-  font-size: 24px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-}
-
-.tagline {
-  font-size: 12px;
-  color: #6b7280;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: -4px;
-}
-
-.workflow-title-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.workflow-title-input {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-  background: transparent;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-  min-width: 200px;
-}
-
-.workflow-title-input:focus {
-  outline: none;
-  background: #f9fafb;
-  box-shadow: 0 0 0 3px #dbeafe;
-}
-
-.workflow-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: #6b7280;
-  font-weight: 500;
 }
 
 .header-center {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.execution-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  flex: 0 0 auto;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex: 1;
   justify-content: flex-end;
+  flex: 1;
 }
 
-.canvas-controls {
+/* =================================
+   LOGO SECTION
+   ================================= */
+.logo-section {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  background: #f9fafb;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
 }
 
-.zoom-display {
-  font-size: 12px;
-  color: #4b5563;
-  font-weight: 600;
-  padding: 0 8px;
-  min-width: 40px;
-  text-align: center;
+.logo-text h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* =================================
+   WORKFLOW TITLE SECTION
+   ================================= */
+.workflow-title-section {
+  flex: 1;
+  max-width: 400px;
+}
+
+.workflow-title-input {
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus {
+    background: white;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+/* =================================
+   WORKFLOW CONTROLS
+   ================================= */
+.workflow-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px;
+}
+
+/* =================================
+   STATUS INDICATOR
+   ================================= */
 .status-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: #f3f4f6;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
-  border: 1px solid #e5e7eb;
+  color: #64748b;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #9ca3af;
+  background: #94a3b8;
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-.status-indicator.executando .status-dot,
-.status-indicator.running .status-dot {
+.status-indicator.running .status-dot,
+.status-indicator.executing .status-dot {
   background: #3b82f6;
 }
 
-.status-indicator.executado-com-sucesso .status-dot,
+.status-indicator.completed .status-dot,
 .status-indicator.success .status-dot {
   background: #10b981;
 }
 
-.status-indicator.erro .status-dot,
+.status-indicator.failed .status-dot,
 .status-indicator.error .status-dot {
   background: #ef4444;
 }
 
+.status-indicator.saved .status-dot {
+  background: #8b5cf6;
+}
+
 @keyframes pulse-dot {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.5;
   }
@@ -206,81 +194,17 @@
   overflow: hidden;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.btn-secondary {
-  background: white;
-  color: #374151;
-  border-color: #d1d5db;
-}
-
-.btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
-}
-
 .btn-outline {
-  background: transparent;
-  color: #6b7280;
-  border-color: #d1d5db;
-}
+  background: white;
+  color: #64748b;
+  border-color: #e2e8f0;
 
-.btn-outline:hover {
-  background: #f9fafb;
-  color: #374151;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-  transform: translateY(-1px);
-}
-
-.btn-icon {
-  padding: 8px;
-  width: 36px;
-  height: 36px;
-}
-
-.btn-xs {
-  padding: 4px 8px;
-  font-size: 12px;
-  height: 28px;
-}
-
-.btn-execute {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  font-weight: 600;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-}
-
-.btn-execute:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: #6b7280;
-  border: none;
-}
-
-.btn-ghost:hover {
-  background: #f3f4f6;
-  color: #374151;
+  &:hover {
+    background: #f8fafc;
+    color: #374151;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
 }
 
 /* Focus visible for accessibility */
@@ -292,17 +216,52 @@
 /* =================================
    RESPONSIVE DESIGN
    ================================= */
+@media (max-width: 1024px) {
+  .workflow-title-section {
+    max-width: 300px;
+  }
+}
+
 @media (max-width: 768px) {
   .app-header {
     padding: 0 16px;
-    height: 64px;
+    height: 56px;
   }
 
   .header-left {
     gap: 16px;
   }
 
+  .logo-text h1 {
+    font-size: 18px;
+  }
+
   .workflow-title-section {
+    max-width: 200px;
+  }
+
+  .workflow-title-input {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
     display: none;
+  }
+
+  .workflow-controls {
+    gap: 8px;
+    padding: 4px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .status-indicator {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }

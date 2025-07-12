@@ -10,50 +10,32 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  @Input() workflowName = 'New Workflow';
-  @Input() workflowStatus = 'Ready';
-  @Input() currentZoom = 100;
-  @Input() nodeCount = 0;
-  @Input() connectionCount = 0;
-
+  @Input() workflowName!: string;
+  @Input() workflowStatus!: string;
+  
   @Output() workflowNameChange = new EventEmitter<string>();
-  @Output() executeWorkflow = new EventEmitter<void>();
-  @Output() clearWorkflow = new EventEmitter<void>();
   @Output() saveWorkflow = new EventEmitter<void>();
   @Output() openLoadDialog = new EventEmitter<void>();
-  @Output() zoomIn = new EventEmitter<void>();
-  @Output() zoomOut = new EventEmitter<void>();
-  @Output() resetZoom = new EventEmitter<void>();
+  @Output() exportWithHistory = new EventEmitter<void>();
+  @Output() newWorkflow = new EventEmitter<void>();
 
-  onWorkflowNameChange(name: string) {
+  onWorkflowNameChange(name: string): void {
     this.workflowNameChange.emit(name);
   }
 
-  onExecuteWorkflow() {
-    this.executeWorkflow.emit();
-  }
-
-  onClearWorkflow() {
-    this.clearWorkflow.emit();
-  }
-
-  onSaveWorkflow() {
+  onSaveWorkflow(): void {
     this.saveWorkflow.emit();
   }
 
-  onOpenLoadDialog() {
+  onOpenLoadDialog(): void {
     this.openLoadDialog.emit();
   }
 
-  onZoomIn() {
-    this.zoomIn.emit();
+  onExportWithHistory(): void {
+    this.exportWithHistory.emit();
   }
 
-  onZoomOut() {
-    this.zoomOut.emit();
-  }
-
-  onResetZoom() {
-    this.resetZoom.emit();
+  onNewWorkflow(): void {
+    this.newWorkflow.emit();
   }
 }

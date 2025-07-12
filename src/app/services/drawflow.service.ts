@@ -171,18 +171,26 @@ export class DrawflowService {
       if (nodeElement) {
         nodeElement.classList.remove('executing', 'success', 'error');
 
-        if (result && !executionResults[nodeId + '_error']) {
-          nodeElement.classList.add('success');
-        } else if (executionResults[nodeId + '_error']) {
+        // Verificar se há erro para este nó
+        const hasError = executionResults[nodeId + '_error'] || 
+                        (result && result.error) ||
+                        (result && result.status === 'error');
+
+        if (hasError) {
           nodeElement.classList.add('error');
+          this.addErrorIndicator(nodeElement, executionResults[nodeId + '_error'] || result.error || 'Unknown error');
+        } else if (result && !hasError) {
+          nodeElement.classList.add('success');
+          this.removeErrorIndicator(nodeElement);
         }
 
+        // Atualizar status dot se existir
         const statusDot = nodeElement.querySelector('.status-dot');
         if (statusDot) {
-          if (result && !executionResults[nodeId + '_error']) {
-            (statusDot as HTMLElement).style.background = '#10b981';
-          } else if (executionResults[nodeId + '_error']) {
+          if (hasError) {
             (statusDot as HTMLElement).style.background = '#ef4444';
+          } else if (result) {
+            (statusDot as HTMLElement).style.background = '#10b981';
           }
         }
       }
@@ -194,6 +202,7 @@ export class DrawflowService {
     if (nodeElement) {
       nodeElement.classList.remove('success', 'error');
       nodeElement.classList.add('executing');
+      this.removeErrorIndicator(nodeElement);
 
       const statusDot = nodeElement.querySelector('.status-dot');
       if (statusDot) {
@@ -202,10 +211,128 @@ export class DrawflowService {
     }
   }
 
+  setNodeError(nodeId: string, errorMessage: string): void {
+    const nodeElement = document.querySelector(`#node-${nodeId}`);
+    if (nodeElement) {
+      nodeElement.classList.remove('executing', 'success');
+      nodeElement.classList.add('error');
+      this.addErrorIndicator(nodeElement, errorMessage);
+
+      const statusDot = nodeElement.querySelector('.status-dot');
+      if (statusDot) {
+        (statusDot as HTMLElement).style.background = '#ef4444';
+      }
+
+      console.error(`Node ${nodeId} marked as error:`, errorMessage);
+    }
+  }
+
+  setNodeSuccess(nodeId: string): void {
+    const nodeElement = document.querySelector(`#node-${nodeId}`);
+    if (nodeElement) {
+      nodeElement.classList.remove('executing', 'error');
+      nodeElement.classList.add('success');
+      this.removeErrorIndicator(nodeElement);
+
+      const statusDot = nodeElement.querySelector('.status-dot');
+      if (statusDot) {
+        (statusDot as HTMLElement).style.background = '#10b981';
+      }
+    }
+  }
+
+  private addErrorIndicator(nodeElement: Element, errorMessage: string): void {
+    // Remover indicador anterior se existir
+    this.removeErrorIndicator(nodeElement);
+
+    // Criar indicador de erro
+    const errorIndicator = document.createElement('div');
+    errorIndicator.className = 'error-indicator';
+    errorIndicator.innerHTML = `
+      <div class="error-icon">⚠️</div>
+      <div class="error-tooltip">
+        <div class="error-title">Execution Error</div>
+        <div class="error-message">${this.escapeHtml(errorMessage)}</div>
+      </div>
+    `;
+
+    // Adicionar ao nó
+    nodeElement.appendChild(errorIndicator);
+
+    // Adicionar eventos para mostrar/esconder tooltip
+    let tooltipTimeout: any;
+    
+    errorIndicator.addEventListener('mouseenter', () => {
+      clearTimeout(tooltipTimeout);
+      const tooltip = errorIndicator.querySelector('.error-tooltip') as HTMLElement;
+      if (tooltip) {
+        // Ajustar posicionamento do tooltip baseado na posição do nó
+        const nodeRect = nodeElement.getBoundingClientRect();
+        const containerRect = nodeElement.closest('.drawflow')?.getBoundingClientRect();
+        
+        if (containerRect && nodeRect) {
+          const relativeTop = nodeRect.top - containerRect.top;
+          const relativeRight = containerRect.right - nodeRect.right;
+          
+          // Se o nó está muito à direita, mostrar tooltip à esquerda
+          if (relativeRight < 320) {
+            tooltip.style.right = 'auto';
+            tooltip.style.left = '-280px';
+          }
+          
+          // Se o nó está muito em cima, mostrar tooltip abaixo
+          if (relativeTop < 100) {
+            tooltip.style.top = '30px';
+          }
+        }
+        
+        tooltip.style.display = 'block';
+      }
+    });
+
+    errorIndicator.addEventListener('mouseleave', () => {
+      tooltipTimeout = setTimeout(() => {
+        const tooltip = errorIndicator.querySelector('.error-tooltip') as HTMLElement;
+        if (tooltip) {
+          tooltip.style.display = 'none';
+        }
+      }, 100); // Pequeno delay para evitar flickering
+    });
+
+    // Também esconder se clicar fora
+    document.addEventListener('click', (e) => {
+      if (!errorIndicator.contains(e.target as Node)) {
+        const tooltip = errorIndicator.querySelector('.error-tooltip') as HTMLElement;
+        if (tooltip) {
+          tooltip.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  private removeErrorIndicator(nodeElement: Element): void {
+    const existingIndicator = nodeElement.querySelector('.error-indicator');
+    if (existingIndicator) {
+      existingIndicator.remove();
+    }
+  }
+
+  private escapeHtml(text: string): string {
+    const map: { [key: string]: string } = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
+  }
+
   resetNodeStates(): void {
     const nodeElements = document.querySelectorAll('.drawflow-node');
     nodeElements.forEach(nodeElement => {
       nodeElement.classList.remove('executing', 'success', 'error');
+      this.removeErrorIndicator(nodeElement);
 
       const statusDot = nodeElement.querySelector('.status-dot');
       if (statusDot) {

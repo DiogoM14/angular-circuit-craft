@@ -2,17 +2,11 @@
   <app-header
     [workflowName]="workflowName"
     [workflowStatus]="workflowStatus"
-    [currentZoom]="currentZoom"
-    [nodeCount]="nodeCount"
-    [connectionCount]="connectionCount"
     (workflowNameChange)="workflowName = $event"
-    (executeWorkflow)="executeWorkflow()"
-    (clearWorkflow)="clearWorkflow()"
     (saveWorkflow)="saveWorkflow()"
     (openLoadDialog)="openLoadDialog()"
-    (zoomIn)="zoomIn()"
-    (zoomOut)="zoomOut()"
-    (resetZoom)="resetZoom()"
+    (exportWithHistory)="exportWorkflowWithHistory()"
+    (newWorkflow)="newWorkflow()"
   />
 
   <div class="app-workspace">
@@ -36,6 +30,18 @@
       (drawflowContainerReady)="drawflowContainer = $event"
     />
   </div>
+
+  <app-bottom-toolbar
+    [currentZoom]="currentZoom"
+    [nodeCount]="nodeCount"
+    [connectionCount]="connectionCount"
+    (executeWorkflow)="executeWorkflow()"
+    (clearWorkflow)="clearWorkflow()"
+    (openHistory)="openHistoryDialog()"
+    (zoomIn)="zoomIn()"
+    (zoomOut)="zoomOut()"
+    (resetZoom)="resetZoom()"
+  />
 
   <div class="dialog-overlay" *ngIf="showConfigDialog" (click)="closeConfigDialog()">
     <div class="dialog-container" (click)="$event.stopPropagation()">
@@ -528,6 +534,10 @@
             <i class="icon">🗑️</i>
             Delete Node
           </button>
+          <button class="btn btn-warning" (click)="testNodeError()" *ngIf="selectedNode" style="margin-left: 10px;">
+            <i class="icon">⚠️</i>
+            Test Error
+          </button>
         </div>
         <div class="footer-right">
           <button class="btn btn-secondary" (click)="closeConfigDialog()">Cancel</button>
@@ -605,3 +615,19 @@
     </div>
   </div>
 </div>
+
+<!-- Workflow History Dialog -->
+<app-workflow-history-dialog
+  [workflowId]="currentWorkflowId || ''"
+  [workflowName]="workflowName"
+  [isVisible]="showHistoryDialog"
+  (closeDialog)="closeHistoryDialog()"
+  (versionRestored)="onVersionRestored($event)"
+></app-workflow-history-dialog>
+
+<!-- Hidden file input for importing workflows with history -->
+<input type="file" 
+       #fileInput 
+       accept=".json" 
+       style="display: none" 
+       (change)="importWorkflowWithHistory($event)">

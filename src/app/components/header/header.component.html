@@ -19,40 +19,27 @@
   </div>
 
   <div class="header-center">
-    <div class="execution-controls">
-      <button class="btn btn-execute" (click)="onExecuteWorkflow()">
-        <span>▶️</span>
-        Run
-      </button>
-      <button class="btn btn-secondary" (click)="onClearWorkflow()">
-        <span>🗑️</span>
-        Clear
-      </button>
-      <button class="btn btn-outline" (click)="onSaveWorkflow()">
+    <div class="workflow-controls">
+      <button class="btn btn-outline" (click)="onSaveWorkflow()" title="Save Workflow">
         <span>💾</span>
         Save
       </button>
-      <button class="btn btn-outline" (click)="onOpenLoadDialog()">
+      <button class="btn btn-outline" (click)="onOpenLoadDialog()" title="Load Workflow">
         <span>📂</span>
-        Load
+        Upload
+      </button>
+      <button class="btn btn-outline" (click)="onExportWithHistory()" title="Export with History">
+        <span>📦</span>
+        Export
+      </button>
+      <button class="btn btn-outline" (click)="onNewWorkflow()" title="New Workflow">
+        <span>✨</span>
+        New
       </button>
     </div>
   </div>
 
   <div class="header-right">
-    <div class="canvas-controls">
-      <button class="btn btn-icon" (click)="onZoomOut()" title="Zoom Out">
-        <i class="icon">🔍-</i>
-      </button>
-      <span class="zoom-display">{{ currentZoom }}%</span>
-      <button class="btn btn-icon" (click)="onZoomIn()" title="Zoom In">
-        <i class="icon">🔍+</i>
-      </button>
-      <button class="btn btn-icon" (click)="onResetZoom()" title="Fit to Screen">
-        <i class="icon">⚡</i>
-      </button>
-    </div>
-    
     <div class="status-indicator" [class]="workflowStatus.toLowerCase().replace(' ', '-')">
       <div class="status-dot"></div>
       <span>{{ workflowStatus }}</span>
