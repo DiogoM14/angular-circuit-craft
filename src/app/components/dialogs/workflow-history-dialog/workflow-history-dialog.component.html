@@ -1,8 +1,10 @@
 <div class="dialog-overlay" *ngIf="isVisible" (click)="close()">
   <div class="dialog-container" (click)="$event.stopPropagation()">
     <div class="dialog-header">
-      <h2>📋 Workflow History</h2>
-      <h3>{{ workflowName || 'Workflow' }}</h3>
+      <div class="header-content">
+        <h2>Workflow History</h2>
+        <p>{{ workflowName || 'Workflow' }}</p>
+      </div>
       <button class="btn-close" (click)="close()">×</button>
     </div>
 
@@ -11,20 +13,20 @@
         class="tab-button" 
         [class.active]="activeTab === 'history'"
         (click)="activeTab = 'history'">
-        📜 History
+        History
       </button>
       <button 
         class="tab-button" 
         [class.active]="activeTab === 'stats'"
         (click)="activeTab = 'stats'">
-        📊 Statistics
+        Statistics
       </button>
       <button 
         class="tab-button" 
         [class.active]="activeTab === 'comparison'"
         [disabled]="!showComparison"
         (click)="activeTab = 'comparison'">
-        🔄 Comparison
+        Comparison
       </button>
     </div>
 
@@ -64,7 +66,7 @@
               class="btn btn-sm btn-primary" 
               [disabled]="selectedEntries.length !== 2"
               (click)="compareVersions()">
-              🔄 Compare Selected
+              Compare Selected
             </button>
           </div>
         </div>
@@ -116,14 +118,14 @@
               <button 
                 class="btn btn-xs btn-outline"
                 (click)="$event.stopPropagation(); restoreVersion(entry.version)">
-                🔄 Restore
+                Restore
               </button>
             </div>
           </div>
         </div>
 
         <div class="no-history" *ngIf="filteredEntries.length === 0 && !loading">
-          <p>📝 No history found for this workflow.</p>
+          <p>No history found for this workflow.</p>
         </div>
       </div>
 
@@ -182,7 +184,7 @@
         </div>
 
         <div class="no-stats" *ngIf="!historyStats">
-          <p>📊 No statistics available for this workflow.</p>
+          <p>No statistics available for this workflow.</p>
         </div>
       </div>
 
@@ -191,7 +193,7 @@
         <div class="comparison-header">
           <h3>Version Comparison</h3>
           <button class="btn btn-sm btn-outline" (click)="closeComparison()">
-            ✕ Close Comparison
+            Close Comparison
           </button>
         </div>
 

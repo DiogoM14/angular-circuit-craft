@@ -339,6 +339,7 @@ export class AppComponent implements OnInit {
       this.workflowName = workflow.name;
       this.currentWorkflowId = workflow.id;
       this.workflowStatus = 'Loaded';
+      this.updateStats(); // Update node count to hide empty state
       this.closeLoadDialog();
     }
   }
@@ -356,7 +357,14 @@ export class AppComponent implements OnInit {
 
   deleteWorkflow(workflowId: string) {
     if (confirm('Are you sure you want to delete this workflow?')) {
+      const beforeCount = this.savedWorkflows.length;
       this.savedWorkflows = this.workflowStorageService.deleteWorkflow(workflowId);
+      const afterCount = this.savedWorkflows.length;
+      console.log(`Workflows before: ${beforeCount}, after: ${afterCount}`);
+      
+      // Force UI refresh
+      this.loadSavedWorkflows();
+      console.log('Final workflows count:', this.savedWorkflows.length);
     }
   }
 

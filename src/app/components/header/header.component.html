@@ -20,6 +20,10 @@
 
   <div class="header-center">
     <div class="workflow-controls">
+      <button class="btn btn-outline" (click)="onNewWorkflow()" title="New Workflow">
+        <span>✨</span>
+        New
+      </button>
       <button class="btn btn-outline" (click)="onOpenLoadDialog()" title="Load Workflow">
         <span>📂</span>
         Upload
@@ -27,10 +31,6 @@
       <button class="btn btn-outline" (click)="onExportWithHistory()" title="Export with History">
         <span>📦</span>
         Export
-      </button>
-      <button class="btn btn-outline" (click)="onNewWorkflow()" title="New Workflow">
-        <span>✨</span>
-        New
       </button>
     </div>
   </div>

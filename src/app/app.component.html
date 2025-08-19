@@ -547,9 +547,6 @@
   <div class="dialog-container" style="max-width: 600px" (click)="$event.stopPropagation()">
     <div class="dialog-header">
       <div class="dialog-header-content">
-        <div class="node-type-indicator" style="background: #dcfce7; border-color: #86efac;">
-          <span class="node-icon">📂</span>
-        </div>
         <div class="dialog-title-section">
           <h2>Load Workflow</h2>
           <p>Select a saved workflow to load</p>
@@ -574,13 +571,7 @@
           <div class="workflow-info">
             <div class="workflow-header">
               <h3>{{ workflow.name || 'Unnamed Workflow' }}</h3>
-              <div class="workflow-actions">
-                <button class="btn btn-xs btn-danger" 
-                        (click)="$event.stopPropagation(); deleteWorkflow(workflow.id)"
-                        title="Delete workflow">
-                  🗑️
-                </button>
-              </div>
+
             </div>
             <div class="workflow-meta">
               <span class="created-date">
@@ -590,6 +581,13 @@
                 📦 {{ (workflow.data.drawflow.Home.data | keyvalue).length }} nodes
               </span>
             </div>
+          </div>
+          <div class="workflow-actions">
+            <button class="btn btn-xs btn-danger" 
+                    (click)="$event.stopPropagation(); deleteWorkflow(workflow.id)"
+                    title="Delete workflow">
+              🗑️
+            </button>
           </div>
           <div class="workflow-preview">
             <span class="preview-icon">🚀</span>
