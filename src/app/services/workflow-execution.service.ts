@@ -39,12 +39,12 @@ export class WorkflowExecutionService {
 
           console.log(`Executing node: ${node.name} (${node.type})`);
 
-          // Marcar nó como executando
+          // Mark node as executing
           this.drawflowService.setNodeExecuting(node.id);
 
           const result = await this.nodeExecutionService.executeNode(node, executionResult.results, workflowData.connections);
           
-          // Marcar nó como sucesso
+          // Mark node as success
           this.drawflowService.setNodeSuccess(node.id);
           
           executionResult.results[node.id] = result;
@@ -58,23 +58,23 @@ export class WorkflowExecutionService {
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
           
-          // Marcar nó como erro imediatamente
+          // Mark node as error immediately
           this.drawflowService.setNodeError(node.id, errorMsg);
           
-          // Registrar erro nos resultados
+          // Register error in results
           executionResult.errors[node.id] = errorMsg;
           executionResult.results[node.id + '_error'] = errorMsg;
           
           console.error(`Error in node ${node.name}:`, errorMsg);
           executionResult.status = 'failed';
           
-          // Não parar a execução se for um nó opcional ou de display
+          // Don't stop execution if it's an optional or display node
           if (this.isOptionalNode(node.type)) {
             console.log(`Continuing execution despite error in optional node: ${node.name}`);
             continue;
           }
           
-          // Para nós críticos, parar a execução
+          // For critical nodes, stop execution
           break;
         }
       }
@@ -235,7 +235,7 @@ export class WorkflowExecutionService {
   }
 
   private isOptionalNode(nodeType: string): boolean {
-    // Nós que não devem parar a execução em caso de erro
+    // Nodes that should not stop execution in case of error
     const optionalNodeTypes = ['display-data', 'email'];
     return optionalNodeTypes.includes(nodeType);
   }

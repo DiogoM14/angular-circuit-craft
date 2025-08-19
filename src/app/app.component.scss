@@ -334,7 +334,6 @@ app-canvas {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 16px;
-  align-items: end;
 }
 
 .form-group-sm {
@@ -1661,7 +1660,7 @@ app-canvas {
   outline-offset: 2px;
 }
 
-// Estilos específicos para nós restaurados
+// Specific styles for restored nodes
 ::ng-deep .drawflow-node {
   .modern-node {
     background: white;
@@ -1726,7 +1725,7 @@ app-canvas {
     }
   }
 
-  // Estilos específicos por tipo de nó
+  // Specific styles by node type
   .node-type-http-request {
     .node-icon-container {
       background: #dbeafe;
@@ -1791,7 +1790,7 @@ app-canvas {
     }
   }
 
-  // Estados de execução
+  // Execution states
   &.executing .modern-node {
     border-color: #3b82f6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
@@ -1812,7 +1811,7 @@ app-canvas {
     background: #fef2f2;
   }
 
-  // Indicador de erro
+  // Error indicator
   .error-indicator {
     position: absolute;
     top: -8px;

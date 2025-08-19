@@ -3,7 +3,6 @@
     [workflowName]="workflowName"
     [workflowStatus]="workflowStatus"
     (workflowNameChange)="workflowName = $event"
-    (saveWorkflow)="saveWorkflow()"
     (openLoadDialog)="openLoadDialog()"
     (exportWithHistory)="exportWorkflowWithHistory()"
     (newWorkflow)="newWorkflow()"
@@ -35,6 +34,7 @@
     [currentZoom]="currentZoom"
     [nodeCount]="nodeCount"
     [connectionCount]="connectionCount"
+    (saveWorkflow)="saveWorkflow()"
     (executeWorkflow)="executeWorkflow()"
     (clearWorkflow)="clearWorkflow()"
     (openHistory)="openHistoryDialog()"
@@ -530,17 +530,12 @@
 
       <div class="dialog-footer">
         <div class="footer-left">
-          <button class="btn btn-danger" (click)="deleteSelectedNode()">
-            <i class="icon">🗑️</i>
-            Delete Node
-          </button>
           <button class="btn btn-warning" (click)="testNodeError()" *ngIf="selectedNode" style="margin-left: 10px;">
             <i class="icon">⚠️</i>
             Test Error
           </button>
         </div>
         <div class="footer-right">
-          <button class="btn btn-secondary" (click)="closeConfigDialog()">Cancel</button>
           <button class="btn btn-primary" (click)="closeConfigDialog()">Save Changes</button>
         </div>
       </div>

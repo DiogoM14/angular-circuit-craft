@@ -53,12 +53,12 @@ export class NodeExecutionService {
         throw new Error(`Invalid URL format: ${config.url}`);
       }
 
-      // Verificar protocolos permitidos
+      // Check allowed protocols
       if (!['http:', 'https:'].includes(url.protocol)) {
         throw new Error(`Unsupported protocol: ${url.protocol}. Only HTTP and HTTPS are allowed.`);
       }
 
-      // Verificar se não é localhost em produção (exemplo de validação)
+      // Check if not localhost in production (example validation)
       if (url.hostname === 'localhost' && url.port && !['3000', '4200', '8080'].includes(url.port)) {
         throw new Error(`Localhost port ${url.port} not allowed. Use ports 3000, 4200, or 8080 for development.`);
       }
@@ -90,7 +90,7 @@ export class NodeExecutionService {
 
       const response = await fetch(config.url, options);
       
-      // Verificar se a resposta é válida
+      // Check if response is valid
       if (!response.ok) {
         throw new Error(`HTTP ${response.status} ${response.statusText}: Request failed`);
       }
@@ -118,7 +118,7 @@ export class NodeExecutionService {
       };
 
     } catch (error) {
-      // Capturar erros de rede também
+      // Capture network errors as well
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error(`Network error: Could not connect to ${config.url}. Check if the server is running and the URL is correct.`);
       }
@@ -168,15 +168,15 @@ export class NodeExecutionService {
 
       console.log('Filtering data with condition:', condition);
       
-      // Simular filtro simples
+      // Simulate simple filter
       const filteredData = data.filter((item, index) => {
-        // Exemplo: filtrar por índice par/ímpar ou por propriedades básicas
+        // Example: filter by even/odd index or by basic properties
         if (condition.includes('even')) {
           return index % 2 === 0;
         } else if (condition.includes('odd')) {
           return index % 2 !== 0;
         } else {
-          // Filtro padrão - retorna todos os itens
+          // Default filter - returns all items
           return true;
         }
       });
@@ -201,7 +201,7 @@ export class NodeExecutionService {
         throw new Error('Delay cannot be negative');
       }
       
-      if (delayMs > 300000) { // 5 minutos máximo
+      if (delayMs > 300000) { // 5 minutes maximum
         throw new Error('Delay cannot exceed 5 minutes (300000ms)');
       }
       

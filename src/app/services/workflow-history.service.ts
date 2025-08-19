@@ -22,7 +22,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Cria uma nova entrada no histórico do workflow
+   * Creates a new entry in the workflow history
    */
   createHistoryEntry(
     workflow: Workflow,
@@ -59,7 +59,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Obtém o histórico completo de um workflow
+   * Gets the complete history of a workflow
    */
   getWorkflowHistory(workflowId: string): WorkflowHistory | null {
     const histories = this.workflowHistories.value;
@@ -67,7 +67,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Obtém as entradas do histórico filtradas
+   * Gets filtered history entries
    */
   getHistoryEntries(workflowId: string, filter?: WorkflowHistoryFilter): WorkflowHistoryEntry[] {
     const history = this.getWorkflowHistory(workflowId);
@@ -97,7 +97,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Obtém uma versão específica do workflow
+   * Gets a specific version of the workflow
    */
   getWorkflowVersion(workflowId: string, version: number): WorkflowHistoryEntry | null {
     const history = this.getWorkflowHistory(workflowId);
@@ -107,7 +107,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Restaura uma versão específica do workflow
+   * Restores a specific version of the workflow
    */
   restoreWorkflowVersion(workflowId: string, version: number): Workflow | null {
     const historyEntry = this.getWorkflowVersion(workflowId, version);
@@ -116,7 +116,7 @@ export class WorkflowHistoryService {
     const restoredWorkflow = { ...historyEntry.snapshot };
     restoredWorkflow.updatedAt = new Date();
     
-    // Cria uma nova entrada no histórico para a restauração
+    // Create a new history entry for the restoration
     this.createHistoryEntry(
       restoredWorkflow,
       `Restored from version ${version}`,
@@ -127,7 +127,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Compara duas versões de um workflow
+   * Compares two versions of a workflow
    */
   compareVersions(workflowId: string, oldVersion: number, newVersion: number): WorkflowVersionComparison | null {
     const oldEntry = this.getWorkflowVersion(workflowId, oldVersion);
@@ -155,7 +155,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Remove o histórico de um workflow
+   * Deletes the history of a workflow
    */
   deleteWorkflowHistory(workflowId: string): void {
     const histories = this.workflowHistories.value;
@@ -165,7 +165,7 @@ export class WorkflowHistoryService {
   }
 
   /**
-   * Obtém estatísticas do histórico
+   * Gets history statistics
    */
   getHistoryStats(workflowId: string): any {
     const history = this.getWorkflowHistory(workflowId);

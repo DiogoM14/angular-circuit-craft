@@ -24,7 +24,7 @@ export class WorkflowStorageService {
     workflows.push(workflow);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(workflows));
 
-    // Criar entrada no histórico
+    // Create history entry
     this.createHistoryEntryFromDrawflow(workflow, 'created');
 
     console.log('Workflow saved:', workflow);
@@ -44,7 +44,7 @@ export class WorkflowStorageService {
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(workflows));
 
-      // Criar entrada no histórico
+      // Create history entry
       this.createHistoryEntryFromDrawflow(workflows[index], 'modified');
 
       console.log('Workflow updated:', workflows[index]);
@@ -73,7 +73,7 @@ export class WorkflowStorageService {
 
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(workflows));
 
-    // Criar entrada no histórico
+    // Create history entry
     this.workflowHistoryService.createHistoryEntry(
       workflow,
       changeDescription,
@@ -93,7 +93,7 @@ export class WorkflowStorageService {
     const updatedWorkflows = workflows.filter(w => w.id !== workflowId);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedWorkflows));
 
-    // Remover histórico também
+    // Remove history as well
     this.workflowHistoryService.deleteWorkflowHistory(workflowId);
 
     return updatedWorkflows;
@@ -123,7 +123,7 @@ export class WorkflowStorageService {
     try {
       if (!importData.workflow) return false;
 
-      // Gerar novo ID para evitar conflitos
+      // Generate new ID to avoid conflicts
       const newId = Date.now().toString();
       const workflow = {
         ...importData.workflow,
@@ -132,18 +132,18 @@ export class WorkflowStorageService {
         updatedAt: new Date().toISOString()
       };
 
-      // Salvar workflow
+      // Save workflow
       const saved = localStorage.getItem(this.STORAGE_KEY);
       const workflows = saved ? JSON.parse(saved) : [];
       workflows.push(workflow);
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(workflows));
 
-      // Importar histórico se existir
+      // Import history if it exists
       if (importData.history) {
-        // Criar entrada inicial no histórico
+        // Create initial history entry
         this.createHistoryEntryFromDrawflow(workflow, 'created');
         
-        // Adicionar nota sobre importação
+        // Add note about import
         const workflowObj = this.convertDrawflowToWorkflow(workflow);
         this.workflowHistoryService.createHistoryEntry(
           workflowObj,
@@ -180,7 +180,7 @@ export class WorkflowStorageService {
     const drawflowData = workflowData.data || {};
     const nodes = drawflowData.drawflow?.Home?.data || {};
     
-    // Converter nodes do drawflow para o formato Workflow
+    // Convert drawflow nodes to Workflow format
     const workflowNodes = Object.keys(nodes).map(nodeId => {
       const node = nodes[nodeId];
       return {
@@ -193,7 +193,7 @@ export class WorkflowStorageService {
         },
         data: {
           ...node.data || {},
-          // Preservar informações extras para restauração
+          // Preserve extra information for restoration
           originalHtml: node.html || '',
           originalInputs: Object.keys(node.inputs || {}),
           originalOutputs: Object.keys(node.outputs || {})
@@ -203,7 +203,7 @@ export class WorkflowStorageService {
       };
     });
 
-    // Converter conexões
+    // Convert connections
     const connections: any[] = [];
     Object.keys(nodes).forEach(nodeId => {
       const node = nodes[nodeId];
@@ -241,7 +241,7 @@ export class WorkflowStorageService {
   private convertWorkflowToDrawflow(workflow: Workflow): any {
     const nodes: any = {};
     
-    // Converter nodes para formato drawflow
+    // Convert nodes to drawflow format
     workflow.nodes.forEach(node => {
       nodes[node.id] = {
         id: parseInt(node.id),
@@ -257,7 +257,7 @@ export class WorkflowStorageService {
       };
     });
 
-    // Converter conexões
+    // Convert connections
     workflow.connections.forEach(connection => {
       const sourceNode = nodes[connection.sourceNode];
       const targetNode = nodes[connection.targetNode];

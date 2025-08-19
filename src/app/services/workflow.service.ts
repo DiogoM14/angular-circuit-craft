@@ -34,7 +34,7 @@ export class WorkflowService {
     this.workflows.next(workflows);
     this.saveWorkflowsToStorage();
 
-    // Registra no histórico
+    // Register in history
     this.workflowHistoryService.createHistoryEntry(
       workflow,
       `Workflow '${name}' created`,
@@ -55,7 +55,7 @@ export class WorkflowService {
       this.workflows.next(workflows);
       this.saveWorkflowsToStorage();
 
-      // Registra no histórico
+      // Register in history
       this.workflowHistoryService.createHistoryEntry(
         workflow,
         changeDescription || `Workflow '${workflow.name}' updated`,
@@ -73,7 +73,7 @@ export class WorkflowService {
     this.workflows.next(workflows);
     this.saveWorkflowsToStorage();
 
-    // Remove o histórico também
+    // Remove history as well
     this.workflowHistoryService.deleteWorkflowHistory(workflowId);
 
     if (this.currentWorkflow.value?.id === workflowId) {
@@ -126,7 +126,7 @@ export class WorkflowService {
 
     executionResult.endTime = new Date();
     
-    // Registra a execução no histórico
+    // Register execution in history
     const duration = executionResult.endTime.getTime() - startTime.getTime();
     this.workflowHistoryService.createHistoryEntry(
       workflow,
@@ -145,7 +145,7 @@ export class WorkflowService {
   }
 
   /**
-   * Restaura uma versão específica do workflow
+   * Restores a specific version of the workflow
    */
   restoreWorkflowVersion(workflowId: string, version: number): boolean {
     try {
@@ -162,7 +162,7 @@ export class WorkflowService {
       
       console.log('Restored workflow:', restoredWorkflow);
       
-      // Atualizar no service atual
+              // Update in current service
       this.updateWorkflow(restoredWorkflow, `Restored from version ${version}`);
       
       return true;
@@ -173,21 +173,21 @@ export class WorkflowService {
   }
 
   /**
-   * Obtém o histórico de um workflow
+   * Gets the history of a workflow
    */
   getWorkflowHistory(workflowId: string) {
     return this.workflowHistoryService.getWorkflowHistory(workflowId);
   }
 
   /**
-   * Obtém estatísticas do histórico de um workflow
+   * Gets history statistics for a workflow
    */
   getWorkflowHistoryStats(workflowId: string) {
     return this.workflowHistoryService.getHistoryStats(workflowId);
   }
 
   /**
-   * Compara duas versões de um workflow
+   * Compares two versions of a workflow
    */
   compareWorkflowVersions(workflowId: string, oldVersion: number, newVersion: number) {
     return this.workflowHistoryService.compareVersions(workflowId, oldVersion, newVersion);

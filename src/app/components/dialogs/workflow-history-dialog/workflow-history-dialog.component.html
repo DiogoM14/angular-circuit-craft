@@ -1,7 +1,7 @@
 <div class="dialog-overlay" *ngIf="isVisible" (click)="close()">
   <div class="dialog-container" (click)="$event.stopPropagation()">
     <div class="dialog-header">
-      <h2>📋 Histórico do Workflow</h2>
+      <h2>📋 Workflow History</h2>
       <h3>{{ workflowName || 'Workflow' }}</h3>
       <button class="btn-close" (click)="close()">×</button>
     </div>
@@ -11,20 +11,20 @@
         class="tab-button" 
         [class.active]="activeTab === 'history'"
         (click)="activeTab = 'history'">
-        📜 Histórico
+        📜 History
       </button>
       <button 
         class="tab-button" 
         [class.active]="activeTab === 'stats'"
         (click)="activeTab = 'stats'">
-        📊 Estatísticas
+        📊 Statistics
       </button>
       <button 
         class="tab-button" 
         [class.active]="activeTab === 'comparison'"
         [disabled]="!showComparison"
         (click)="activeTab = 'comparison'">
-        🔄 Comparação
+        🔄 Comparison
       </button>
     </div>
 
@@ -32,25 +32,25 @@
       <!-- Loading -->
       <div *ngIf="loading" class="loading-state">
         <div class="spinner"></div>
-        <p>Carregando histórico...</p>
+        <p>Loading history...</p>
       </div>
 
-      <!-- Histórico Tab -->
+      <!-- History Tab -->
       <div *ngIf="activeTab === 'history' && !loading" class="history-tab">
         <div class="history-filters">
           <div class="filter-group">
-            <label for="filterType">Filtrar por tipo:</label>
+            <label for="filterType">Filter by type:</label>
             <select id="filterType" [(ngModel)]="filterType" (change)="onFilterChange()">
-              <option value="all">Todos</option>
-              <option value="created">Criado</option>
-              <option value="modified">Modificado</option>
-              <option value="executed">Executado</option>
-              <option value="restored">Restaurado</option>
+              <option value="all">All</option>
+              <option value="created">Created</option>
+              <option value="modified">Modified</option>
+              <option value="executed">Executed</option>
+              <option value="restored">Restored</option>
             </select>
           </div>
           
           <div class="filter-group">
-            <label for="filterLimit">Limite:</label>
+            <label for="filterLimit">Limit:</label>
             <select id="filterLimit" [(ngModel)]="filterLimit" (change)="onFilterChange()">
               <option value="20">20</option>
               <option value="50">50</option>
@@ -64,7 +64,7 @@
               class="btn btn-sm btn-primary" 
               [disabled]="selectedEntries.length !== 2"
               (click)="compareVersions()">
-              🔄 Comparar Selecionadas
+              🔄 Compare Selected
             </button>
           </div>
         </div>
@@ -98,16 +98,16 @@
               <div class="execution-info">
                 <span class="execution-status">
                   {{ getExecutionStatusIcon(entry.executionData.status) }}
-                  {{ entry.executionData.status === 'completed' ? 'Sucesso' : 'Falha' }}
+                  {{ entry.executionData.status === 'completed' ? 'Success' : 'Failed' }}
                 </span>
                 <span class="execution-duration" *ngIf="entry.executionData.duration">
                   ⏱️ {{ formatDuration(entry.executionData.duration) }}
                 </span>
                 <span class="execution-nodes">
-                  📦 {{ entry.executionData.nodeCount }} nós
+                  📦 {{ entry.executionData.nodeCount }} nodes
                 </span>
                 <span class="execution-errors" *ngIf="entry.executionData.errorCount > 0">
-                  ❌ {{ entry.executionData.errorCount }} erros
+                  ❌ {{ entry.executionData.errorCount }} errors
                 </span>
               </div>
             </div>
@@ -116,24 +116,24 @@
               <button 
                 class="btn btn-xs btn-outline"
                 (click)="$event.stopPropagation(); restoreVersion(entry.version)">
-                🔄 Restaurar
+                🔄 Restore
               </button>
             </div>
           </div>
         </div>
 
         <div class="no-history" *ngIf="filteredEntries.length === 0 && !loading">
-          <p>📝 Nenhum histórico encontrado para este workflow.</p>
+          <p>📝 No history found for this workflow.</p>
         </div>
       </div>
 
-      <!-- Estatísticas Tab -->
+      <!-- Statistics Tab -->
       <div *ngIf="activeTab === 'stats' && !loading" class="stats-tab">
         <div class="stats-grid" *ngIf="historyStats">
           <div class="stat-card">
             <div class="stat-icon">📊</div>
             <div class="stat-info">
-              <h4>Total de Versões</h4>
+              <h4>Total Versions</h4>
               <p class="stat-value">{{ historyStats.totalVersions }}</p>
             </div>
           </div>
@@ -141,7 +141,7 @@
           <div class="stat-card">
             <div class="stat-icon">▶️</div>
             <div class="stat-info">
-              <h4>Execuções</h4>
+              <h4>Executions</h4>
               <p class="stat-value">{{ historyStats.totalExecutions }}</p>
             </div>
           </div>
@@ -149,7 +149,7 @@
           <div class="stat-card">
             <div class="stat-icon">📝</div>
             <div class="stat-info">
-              <h4>Modificações</h4>
+              <h4>Modifications</h4>
               <p class="stat-value">{{ historyStats.totalModifications }}</p>
             </div>
           </div>
@@ -157,7 +157,7 @@
           <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-info">
-              <h4>Taxa de Sucesso</h4>
+              <h4>Success Rate</h4>
               <p class="stat-value">{{ historyStats.successRate | number:'1.1-1' }}%</p>
             </div>
           </div>
@@ -165,7 +165,7 @@
           <div class="stat-card">
             <div class="stat-icon">⏱️</div>
             <div class="stat-info">
-              <h4>Tempo Médio</h4>
+              <h4>Average Time</h4>
               <p class="stat-value">{{ formatDuration(historyStats.averageExecutionTime) }}</p>
             </div>
           </div>
@@ -173,31 +173,31 @@
           <div class="stat-card">
             <div class="stat-icon">🕒</div>
             <div class="stat-info">
-              <h4>Última Execução</h4>
+              <h4>Last Execution</h4>
               <p class="stat-value">
-                {{ historyStats.lastExecution ? formatTimestamp(historyStats.lastExecution) : 'Nunca' }}
+                {{ historyStats.lastExecution ? formatTimestamp(historyStats.lastExecution) : 'Never' }}
               </p>
             </div>
           </div>
         </div>
 
         <div class="no-stats" *ngIf="!historyStats">
-          <p>📊 Nenhuma estatística disponível para este workflow.</p>
+          <p>📊 No statistics available for this workflow.</p>
         </div>
       </div>
 
-      <!-- Comparação Tab -->
+      <!-- Comparison Tab -->
       <div *ngIf="activeTab === 'comparison' && comparisonResult" class="comparison-tab">
         <div class="comparison-header">
-          <h3>Comparação de Versões</h3>
+          <h3>Version Comparison</h3>
           <button class="btn btn-sm btn-outline" (click)="closeComparison()">
-            ✕ Fechar Comparação
+            ✕ Close Comparison
           </button>
         </div>
 
         <div class="comparison-versions">
           <div class="version-info">
-            <h4>Versão {{ comparisonResult.oldVersion.version }}</h4>
+            <h4>Version {{ comparisonResult.oldVersion.version }}</h4>
             <p>{{ formatTimestamp(comparisonResult.oldVersion.timestamp) }}</p>
             <p>{{ comparisonResult.oldVersion.changeDescription }}</p>
           </div>
@@ -205,38 +205,38 @@
           <div class="comparison-arrow">→</div>
           
           <div class="version-info">
-            <h4>Versão {{ comparisonResult.newVersion.version }}</h4>
+            <h4>Version {{ comparisonResult.newVersion.version }}</h4>
             <p>{{ formatTimestamp(comparisonResult.newVersion.timestamp) }}</p>
             <p>{{ comparisonResult.newVersion.changeDescription }}</p>
           </div>
         </div>
 
         <div class="comparison-differences">
-          <h4>Diferenças</h4>
+          <h4>Differences</h4>
           <div class="diff-grid">
             <div class="diff-item">
-              <span class="diff-label">Nós Adicionados:</span>
+              <span class="diff-label">Nodes Added:</span>
               <span class="diff-value">{{ comparisonResult.differences.nodesAdded }}</span>
             </div>
             <div class="diff-item">
-              <span class="diff-label">Nós Removidos:</span>
+              <span class="diff-label">Nodes Removed:</span>
               <span class="diff-value">{{ comparisonResult.differences.nodesRemoved }}</span>
             </div>
             <div class="diff-item">
-              <span class="diff-label">Nós Modificados:</span>
+              <span class="diff-label">Nodes Modified:</span>
               <span class="diff-value">{{ comparisonResult.differences.nodesModified }}</span>
             </div>
             <div class="diff-item">
-              <span class="diff-label">Conexões Adicionadas:</span>
+              <span class="diff-label">Connections Added:</span>
               <span class="diff-value">{{ comparisonResult.differences.connectionsAdded }}</span>
             </div>
             <div class="diff-item">
-              <span class="diff-label">Conexões Removidas:</span>
+              <span class="diff-label">Connections Removed:</span>
               <span class="diff-value">{{ comparisonResult.differences.connectionsRemoved }}</span>
             </div>
             <div class="diff-item">
-              <span class="diff-label">Metadados Alterados:</span>
-              <span class="diff-value">{{ comparisonResult.differences.metadataChanged ? 'Sim' : 'Não' }}</span>
+              <span class="diff-label">Metadata Changed:</span>
+              <span class="diff-value">{{ comparisonResult.differences.metadataChanged ? 'Yes' : 'No' }}</span>
             </div>
           </div>
         </div>
@@ -246,12 +246,12 @@
     <div class="dialog-footer">
       <div class="footer-info">
         <span *ngIf="workflowHistory">
-          {{ workflowHistory.totalEntries }} entradas no histórico
+          {{ workflowHistory.totalEntries }} history entries
         </span>
       </div>
       <div class="footer-actions">
         <button class="btn btn-outline" (click)="close()">
-          Fechar
+          Close
         </button>
       </div>
     </div>

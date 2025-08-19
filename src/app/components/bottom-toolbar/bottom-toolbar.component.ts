@@ -13,12 +13,17 @@ export class BottomToolbarComponent {
   @Input() nodeCount = 0;
   @Input() connectionCount = 0;
 
+  @Output() saveWorkflow = new EventEmitter<void>();
   @Output() executeWorkflow = new EventEmitter<void>();
   @Output() clearWorkflow = new EventEmitter<void>();
   @Output() openHistory = new EventEmitter<void>();
   @Output() zoomIn = new EventEmitter<void>();
   @Output() zoomOut = new EventEmitter<void>();
   @Output() resetZoom = new EventEmitter<void>();
+
+  onSaveWorkflow() {
+    this.saveWorkflow.emit();
+  }
 
   onExecuteWorkflow() {
     this.executeWorkflow.emit();

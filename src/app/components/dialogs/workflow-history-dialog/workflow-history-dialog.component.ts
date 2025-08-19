@@ -29,12 +29,12 @@ export class WorkflowHistoryDialogComponent implements OnInit, OnChanges {
   filteredEntries: WorkflowHistoryEntry[] = [];
   historyStats: any = null;
   
-  // Filtros
+  // Filters
   filterType: string = 'all';
   filterLimit: number = 50;
   selectedEntries: WorkflowHistoryEntry[] = [];
   
-  // Comparação
+  // Comparison
   showComparison: boolean = false;
   comparisonResult: WorkflowVersionComparison | null = null;
   
@@ -107,21 +107,21 @@ export class WorkflowHistoryDialogComponent implements OnInit, OnChanges {
   }
 
   restoreVersion(version: number): void {
-    if (confirm(`Tem certeza que deseja restaurar a versão ${version}? Isso criará uma nova versão do workflow.`)) {
+    if (confirm(`Are you sure you want to restore version ${version}? This will create a new version of the workflow.`)) {
       const success = this.workflowService.restoreWorkflowVersion(this.workflowId, version);
       if (success) {
         this.versionRestored.emit(version);
         this.loadWorkflowHistory();
-        alert(`Versão ${version} restaurada com sucesso!`);
+        alert(`Version ${version} restored successfully!`);
       } else {
-        alert('Erro ao restaurar versão');
+        alert('Error restoring version');
       }
     }
   }
 
   compareVersions(): void {
     if (this.selectedEntries.length !== 2) {
-      alert('Selecione exatamente 2 versões para comparar');
+      alert('Select exactly 2 versions to compare');
       return;
     }
 
@@ -154,11 +154,11 @@ export class WorkflowHistoryDialogComponent implements OnInit, OnChanges {
 
   getChangeTypeLabel(type: string): string {
     switch (type) {
-      case 'created': return 'Criado';
-      case 'modified': return 'Modificado';
-      case 'executed': return 'Executado';
-      case 'restored': return 'Restaurado';
-      default: return 'Desconhecido';
+      case 'created': return 'Created';
+      case 'modified': return 'Modified';
+      case 'executed': return 'Executed';
+      case 'restored': return 'Restored';
+      default: return 'Unknown';
     }
   }
 
@@ -182,7 +182,7 @@ export class WorkflowHistoryDialogComponent implements OnInit, OnChanges {
   }
 
   formatTimestamp(timestamp: Date): string {
-    return new Date(timestamp).toLocaleString('pt-BR');
+    return new Date(timestamp).toLocaleString('en-US');
   }
 
   trackByEntryId(index: number, entry: WorkflowHistoryEntry): string {

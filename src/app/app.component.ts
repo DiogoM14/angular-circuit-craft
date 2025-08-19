@@ -304,12 +304,12 @@ export class AppComponent implements OnInit {
     const exportData = this.drawflowService.export();
     if (exportData) {
       if (this.currentWorkflowId) {
-        // Atualizar workflow existente
+                  // Update existing workflow
         this.workflowStorageService.updateWorkflow(this.currentWorkflowId, this.workflowName, exportData);
       } else {
-        // Criar novo workflow
+                  // Create new workflow
         this.workflowStorageService.saveWorkflow(this.workflowName, exportData);
-        // Obter o ID do workflow recém-criado
+                  // Get the ID of the newly created workflow
         const workflows = this.workflowStorageService.loadSavedWorkflows();
         const latestWorkflow = workflows[workflows.length - 1];
         this.currentWorkflowId = latestWorkflow.id;
@@ -360,12 +360,12 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // História
+      // History
   openHistoryDialog() {
     if (this.currentWorkflowId) {
       this.showHistoryDialog = true;
     } else {
-      alert('Salve o workflow primeiro para visualizar o histórico');
+              alert('Save the workflow first to view history');
     }
   }
 
@@ -376,38 +376,38 @@ export class AppComponent implements OnInit {
   onVersionRestored(version: number) {
     console.log(`Version ${version} restored, reloading workflow...`);
     
-    // Recarregar o workflow atual
+          // Reload the current workflow
     if (this.currentWorkflowId) {
-      // Primeiro, obter o workflow restaurado do histórico
+              // First, get the restored workflow from history
       const historyEntry = this.workflowHistoryService.getWorkflowVersion(this.currentWorkflowId, version);
       if (!historyEntry) {
         console.error('History entry not found for restoration');
-        alert('Erro: Versão não encontrada no histórico');
+                  alert('Error: Version not found in history');
         return;
       }
 
-      // Converter o workflow do histórico para o formato do drawflow
+              // Convert the workflow from history to drawflow format
       const restoredWorkflow = historyEntry.snapshot;
       console.log('Restored workflow from history:', restoredWorkflow);
       
-      // Converter para o formato de dados do drawflow
+              // Convert to drawflow data format
       const drawflowData = this.convertWorkflowToDrawflowData(restoredWorkflow);
       console.log('Converted drawflow data:', drawflowData);
       
-      // Atualizar no storage
+              // Update in storage
       this.workflowStorageService.updateWorkflow(this.currentWorkflowId, restoredWorkflow.name, drawflowData);
       
-      // Recarregar do storage
+              // Reload from storage
       const workflow = this.workflowStorageService.getWorkflowById(this.currentWorkflowId);
       if (workflow) {
         console.log('Loading restored workflow:', workflow);
         
-        // Limpar o canvas antes de carregar
+                  // Clear the canvas before loading
         this.drawflowService.clear();
         
-        // Aguardar um pouco para garantir que o clear foi processado
+                  // Wait a bit to ensure clear was processed
         setTimeout(() => {
-          // Carregar o workflow restaurado
+                      // Load the restored workflow
           if (workflow.data) {
             console.log('Importing workflow data into drawflow:', workflow.data);
             this.drawflowService.import(workflow.data);
@@ -415,16 +415,16 @@ export class AppComponent implements OnInit {
             this.updateStats();
             this.workflowStatus = `Restored to version ${version}`;
             
-            // Limpar resultados de execução anteriores
+                          // Clear previous execution results
             this.executionResults = {};
             this.displayDataResults = {};
             
-            // Forçar re-renderização dos estilos dos nós
+                          // Force re-rendering of node styles
             setTimeout(() => {
               this.forceNodeRerender();
               console.log('Node re-rendering completed');
               
-              // Debug: Verificar se os nós têm as classes corretas
+                              // Debug: Check if nodes have correct classes
               const modernNodes = document.querySelectorAll('.modern-node');
               console.log(`Found ${modernNodes.length} modern-node elements after restoration`);
               
@@ -439,24 +439,24 @@ export class AppComponent implements OnInit {
         }, 50);
       } else {
         console.error('Workflow not found after restoration');
-        alert('Erro ao recarregar workflow restaurado');
+                  alert('Error reloading restored workflow');
       }
     } else {
       console.error('No current workflow ID');
-      alert('Erro: ID do workflow não encontrado');
+              alert('Error: Workflow ID not found');
     }
   }
 
   private forceNodeRerender() {
-    // Forçar re-renderização dos nós para garantir que os estilos sejam aplicados
+          // Force re-rendering of nodes to ensure styles are applied
     const nodeElements = document.querySelectorAll('.drawflow-node');
     console.log(`Found ${nodeElements.length} nodes to re-render`);
     
     nodeElements.forEach((nodeElement: Element) => {
-      // Forçar recálculo de estilos
+              // Force style recalculation
       (nodeElement as HTMLElement).offsetHeight;
       
-      // Re-aplicar classes se necessário
+              // Re-apply classes if necessary
       const nodeId = nodeElement.id.replace('node-', '');
       const nodeContent = nodeElement.querySelector('.modern-node');
       
@@ -474,45 +474,45 @@ export class AppComponent implements OnInit {
   private convertWorkflowToDrawflowData(workflow: any): any {
     const nodes: any = {};
     
-    // Converter nodes para formato drawflow
+          // Convert nodes to drawflow format
     workflow.nodes.forEach((node: any) => {
-      // Encontrar o template do conector para este tipo de nó
+              // Find the connector template for this node type
       const connectorTemplate = this.connectorTemplates.find(template => template.id === node.type);
       
-      // Criar estruturas de inputs e outputs
+              // Create input and output structures
       const inputs: any = {};
       const outputs: any = {};
       
-      // Usar informações preservadas se disponíveis, senão usar template
+              // Use preserved information if available, otherwise use template
       const originalInputs = node.data?.originalInputs;
       const originalOutputs = node.data?.originalOutputs;
       const originalHtml = node.data?.originalHtml;
       
       if (originalInputs && originalInputs.length > 0) {
-        // Usar inputs originais preservados
+                  // Use preserved original inputs
         originalInputs.forEach((inputKey: string) => {
           inputs[inputKey] = { connections: [] };
         });
       } else if (connectorTemplate) {
-        // Criar inputs baseados no template
+                  // Create inputs based on template
         for (let i = 0; i < connectorTemplate.inputs; i++) {
           inputs[`input_${i + 1}`] = { connections: [] };
         }
       }
       
       if (originalOutputs && originalOutputs.length > 0) {
-        // Usar outputs originais preservados
+                  // Use preserved original outputs
         originalOutputs.forEach((outputKey: string) => {
           outputs[outputKey] = { connections: {} };
         });
       } else if (connectorTemplate) {
-        // Criar outputs baseados no template
+                  // Create outputs based on template
         for (let i = 0; i < connectorTemplate.outputs; i++) {
           outputs[`output_${i + 1}`] = { connections: {} };
         }
       }
       
-      // Limpar dados extras do data para não poluir o nó
+              // Clean extra data to avoid polluting the node
       const cleanData = { ...node.data };
       delete cleanData.originalHtml;
       delete cleanData.originalInputs;
@@ -532,13 +532,13 @@ export class AppComponent implements OnInit {
       };
     });
 
-    // Converter conexões
+          // Convert connections
     workflow.connections.forEach((connection: any) => {
       const sourceNode = nodes[connection.sourceNode];
       const targetNode = nodes[connection.targetNode];
       
       if (sourceNode && targetNode) {
-        // Garantir que os outputs e inputs existam
+                  // Ensure outputs and inputs exist
         if (!sourceNode.outputs[connection.sourceOutput]) {
           sourceNode.outputs[connection.sourceOutput] = { connections: {} };
         }
@@ -547,13 +547,13 @@ export class AppComponent implements OnInit {
           targetNode.inputs[connection.targetInput] = { connections: [] };
         }
 
-        // Conectar output do nó origem ao input do nó destino
+                  // Connect source node output to target node input
         sourceNode.outputs[connection.sourceOutput].connections[connection.id] = {
           node: connection.targetNode,
           output: connection.targetInput
         };
 
-        // Conectar input do nó destino ao output do nó origem
+                  // Connect target node input to source node output
         targetNode.inputs[connection.targetInput].connections.push({
           node: connection.sourceNode,
           input: connection.sourceOutput
@@ -574,7 +574,7 @@ export class AppComponent implements OnInit {
 
   private generateNodeHtmlForRestore(node: any, connectorTemplate: any): string {
     if (!connectorTemplate) {
-      // Fallback para nós com tipos desconhecidos
+              // Fallback for nodes with unknown types
       const nodeTypeClass = `node-type-unknown`;
       return `
         <div class="modern-node ${nodeTypeClass}">
@@ -624,7 +624,7 @@ export class AppComponent implements OnInit {
         URL.revokeObjectURL(url);
       }
     } else {
-      alert('Salve o workflow primeiro para exportar com histórico');
+              alert('Save the workflow first to export with history');
     }
   }
 
@@ -638,12 +638,12 @@ export class AppComponent implements OnInit {
           const success = this.workflowStorageService.importWorkflowWithHistory(importData);
           if (success) {
             this.loadSavedWorkflows();
-            alert('Workflow importado com sucesso!');
+            alert('Workflow imported successfully!');
           } else {
-            alert('Erro ao importar workflow');
+            alert('Error importing workflow');
           }
         } catch (error) {
-          alert('Arquivo inválido');
+          alert('Invalid file');
         }
       };
       reader.readAsText(file);
@@ -659,7 +659,7 @@ export class AppComponent implements OnInit {
     this.executionResults = {};
     this.displayDataResults = {};
 
-    // Resetar estados dos nós
+          // Reset node states
     this.drawflowService.resetNodeStates();
 
     try {
@@ -683,33 +683,33 @@ export class AppComponent implements OnInit {
         }
       });
 
-      // Atualizar visualização dos resultados (incluindo erros)
+              // Update results visualization (including errors)
       this.drawflowService.updateNodesWithResults(this.executionResults);
 
-      // Determinar status final
+              // Determine final status
       if (result.status === 'completed') {
         this.workflowStatus = 'Executed successfully';
       } else if (result.status === 'failed') {
         const errorCount = Object.keys(result.errors).length;
         this.workflowStatus = `Execution failed (${errorCount} error${errorCount > 1 ? 's' : ''})`;
         
-        // Log dos erros para debug
+                  // Log errors for debug
         console.error('Execution errors:', result.errors);
         
-        // Mostrar sumário dos erros no console
+                  // Show error summary in console
         Object.entries(result.errors).forEach(([nodeId, error]) => {
           console.error(`❌ Node ${nodeId}: ${error}`);
         });
       }
 
-      // Registrar execução no histórico se o workflow foi salvo
+              // Register execution in history if workflow was saved
       if (this.currentWorkflowId) {
         const workflow = this.workflowStorageService.getWorkflowById(this.currentWorkflowId);
         if (workflow) {
           const workflowObj = this.workflowStorageService['convertDrawflowToWorkflow'](workflow);
           const duration = result.endTime ? result.endTime.getTime() - result.startTime.getTime() : 0;
           
-          // Determinar o status correto baseado no resultado
+                      // Determine correct status based on result
           let executionStatus: 'completed' | 'failed' = 'completed';
           if (result.status === 'failed') {
             executionStatus = 'failed';
@@ -736,12 +736,12 @@ export class AppComponent implements OnInit {
       console.error('Workflow execution error:', error);
       this.workflowStatus = 'Execution error';
       
-      // Mostrar erro geral se não conseguir executar o workflow
+              // Show general error if workflow cannot be executed
       const errorMessage = error instanceof Error ? error.message : 'Unknown execution error';
       console.error('❌ Workflow execution failed:', errorMessage);
     }
 
-    // Resetar status após alguns segundos
+          // Reset status after a few seconds
     setTimeout(() => {
       if (this.workflowStatus.includes('Executed') || this.workflowStatus.includes('failed')) {
         this.workflowStatus = 'Ready';
@@ -749,7 +749,7 @@ export class AppComponent implements OnInit {
     }, 5000);
   }
 
-  // Método para testar erros (pode ser removido em produção)
+      // Method to test errors (can be removed in production)
   testNodeError() {
     if (this.selectedNode) {
       this.drawflowService.setNodeError(this.selectedNode.id, 'Test error message for debugging');

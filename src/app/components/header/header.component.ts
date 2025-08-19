@@ -14,17 +14,12 @@ export class HeaderComponent {
   @Input() workflowStatus!: string;
   
   @Output() workflowNameChange = new EventEmitter<string>();
-  @Output() saveWorkflow = new EventEmitter<void>();
   @Output() openLoadDialog = new EventEmitter<void>();
   @Output() exportWithHistory = new EventEmitter<void>();
   @Output() newWorkflow = new EventEmitter<void>();
 
   onWorkflowNameChange(name: string): void {
     this.workflowNameChange.emit(name);
-  }
-
-  onSaveWorkflow(): void {
-    this.saveWorkflow.emit();
   }
 
   onOpenLoadDialog(): void {
